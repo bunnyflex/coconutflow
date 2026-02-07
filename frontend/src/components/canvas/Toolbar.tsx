@@ -6,6 +6,7 @@ import type { InputNodeConfig } from '../../types/flow';
 import FlowManager from '../panels/FlowManager';
 import { toast } from '../ui/Toast';
 import { ShimmerButton } from '../ui/magicui/shimmer-button';
+import { ShineBorder } from '../ui/magicui/shine-border';
 
 export default function Toolbar() {
   const isRunning = useFlowStore((s) => s.isRunning);
@@ -73,7 +74,8 @@ export default function Toolbar() {
   };
 
   return (
-    <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-gray-700 bg-gray-900/90 px-3 py-2 shadow-lg backdrop-blur-sm">
+    <div className="relative absolute left-1/2 top-4 z-10 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-gray-700 bg-gray-900/90 px-3 py-2 shadow-lg backdrop-blur-sm">
+      <ShineBorder shineColor={["#6366f1", "#3b82f6"]} duration={10} borderWidth={1} />
       {/* Run */}
       {isRunning ? (
         <button

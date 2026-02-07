@@ -16,6 +16,7 @@ import type { NodeType, NodeStatus } from '../../types/flow';
 import { nodeTypes } from '../nodes';
 import Toolbar from './Toolbar';
 import ContextMenu from './ContextMenu';
+import { Particles } from '../ui/magicui/particles';
 
 // Nodes that can only be sources (no input handle)
 const SOURCE_ONLY: Set<NodeType> = new Set(['input']);
@@ -186,8 +187,16 @@ export default function FlowCanvas() {
   );
 
   return (
-    <div ref={reactFlowWrapper} className="h-full w-full">
+    <div ref={reactFlowWrapper} className="relative h-full w-full">
       <Toolbar />
+      <Particles
+        className="absolute inset-0 z-0"
+        quantity={40}
+        color="#6366f1"
+        size={0.3}
+        staticity={80}
+        ease={80}
+      />
       <ReactFlow
         nodes={nodes}
         edges={styledEdges}
@@ -208,7 +217,7 @@ export default function FlowCanvas() {
         }}
         fitView
         deleteKeyCode={['Backspace', 'Delete']}
-        className="bg-gray-950"
+        className="bg-gray-950/80"
       >
         <Background
           variant={BackgroundVariant.Dots}

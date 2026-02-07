@@ -4,6 +4,7 @@ import { useFlowStore } from '../../store/flowStore';
 import { flowWebSocket } from '../../services/websocket';
 import { toast } from '../ui/Toast';
 import { TypingAnimation } from '../ui/magicui/typing-animation';
+import { RippleButton } from '../ui/magicui/ripple-button';
 import type { ChatMessage } from '../../types/flow';
 
 export default function ChatPanel() {
@@ -121,13 +122,14 @@ export default function ChatPanel() {
             rows={1}
             className="flex-1 resize-none rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-indigo-500 focus:outline-none"
           />
-          <button
+          <RippleButton
             onClick={handleSend}
             disabled={!input.trim() || isRunning}
+            rippleColor="#a5b4fc"
             className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {isRunning ? '...' : 'Send'}
-          </button>
+          </RippleButton>
         </div>
         <p className="mt-1 text-xs text-gray-600">
           Enter to send, Shift+Enter for new line
