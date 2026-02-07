@@ -7,7 +7,8 @@ from app.services.execution_engine import ExecutionEngine
 @pytest.mark.asyncio
 async def test_conditional_passes_upstream_data():
     """The conditional node should pass through the upstream content, not 'true'/'false'."""
-    engine = ExecutionEngine()
+    # Always evaluates to "true" for testing — no OpenAI call
+    engine = ExecutionEngine(condition_evaluator=lambda upstream, condition: "true")
 
     # Simulate a compiled graph: Input -> Agent -> Conditional -> Output
     # The conditional evaluates to "true", but the output node should
@@ -33,7 +34,7 @@ async def test_conditional_passes_upstream_data():
     }
 
     events = []
-    async for event in engine.execute(execution_graph, user_input="test input"):
+    async for event in engine.execute(execution_graph, user_input=""):
         events.append(event.to_dict())
 
     # Find the output node's result
@@ -45,13 +46,14 @@ async def test_conditional_passes_upstream_data():
     # The output should contain the agent's content, NOT "true"
     assert output_event["data"] != "true", "Conditional should not replace data with 'true'"
     assert "sunny" in output_event["data"].lower() or "25" in output_event["data"], \
-        "Output should contain upstream agent content"
+        "Output should contain upstream agent content (got: %s)" % output_event["data"]
 
 
 @pytest.mark.asyncio
 async def test_conditional_skips_false_branch():
     """Nodes on the non-taken branch should be skipped entirely."""
-    engine = ExecutionEngine()
+    # Always evaluates to "true" for testing — no OpenAI call
+    engine = ExecutionEngine(condition_evaluator=lambda upstream, condition: "true")
 
     # Graph: Input -> Conditional -> (true) Output-True
     #                              -> (false) Output-False
