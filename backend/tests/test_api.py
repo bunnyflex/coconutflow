@@ -128,3 +128,46 @@ class TestFileUpload:
             files={"file": ("malware.exe", b"MZ\x90\x00", "application/octet-stream")},
         )
         assert resp.status_code == 400
+
+
+class TestFileUploadValidation:
+    """Test file upload validation."""
+
+    def test_upload_binary_file_rejected(self, client):
+        """Binary file should be rejected even with .txt extension."""
+        binary_content = b"\x00\x01\x02\xff\xfe\xfd"
+
+        response = client.post(
+            "/api/upload/",
+            files={"file": ("binary.txt", binary_content, "text/plain")},
+        )
+
+        assert response.status_code == 400
+        data = response.json()
+        assert "not readable text" in data["detail"].lower()
+
+    def test_upload_empty_file_rejected(self, client):
+        """Empty files should be rejected."""
+        response = client.post(
+            "/api/upload/",
+            files={"file": ("empty.txt", b"", "text/plain")},
+        )
+
+        assert response.status_code == 400
+        data = response.json()
+        assert "empty" in data["detail"].lower()
+
+    def test_upload_large_file_includes_warning(self, client):
+        """Large files should return warning in response."""
+        large_content = b"x" * (11 * 1024 * 1024)  # 11MB
+
+        response = client.post(
+            "/api/upload/",
+            files={"file": ("large.txt", large_content, "text/plain")},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "warnings" in data
+        assert len(data["warnings"]) > 0
+        assert "large" in data["warnings"][0].lower()

@@ -11,6 +11,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, UploadFile
 
+from app.services.file_validator import FileValidator
+
 router = APIRouter(prefix="/api/upload", tags=["upload"])
 
 # Upload directory for development
@@ -45,15 +47,32 @@ async def upload_file(file: UploadFile) -> dict:
             detail=f"File exceeds maximum size of {MAX_FILE_SIZE // (1024*1024)} MB",
         )
 
+    # Validate file content
+    validator = FileValidator(contents, filename=file.filename)
+    validation_result = validator.validate()
+
+    if not validation_result["valid"]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file: {validation_result['error']}"
+        )
+
     # Save with a unique ID
     file_id = str(uuid.uuid4())
     dest = UPLOAD_DIR / f"{file_id}{ext}"
     dest.write_bytes(contents)
 
-    return {
+    response = {
         "file_id": file_id,
         "filename": file.filename,
         "size": len(contents),
         "extension": ext,
         "path": str(dest),
+        "file_type": validation_result["file_type"],
     }
+
+    # Include warnings if any
+    if validation_result["warnings"]:
+        response["warnings"] = validation_result["warnings"]
+
+    return response
