@@ -150,24 +150,31 @@ class ExecutionEngine:
         edges: list[dict[str, Any]],
         node_outputs: dict[str, str],
     ) -> str:
-        """Evaluate a condition using a lightweight LLM call."""
-        from agno.agent import Agent
-        from agno.models.openai import OpenAIChat
-
+        """Evaluate a condition. Returns upstream data; stores branch decision."""
         upstream = _get_upstream_output(node_id, edges, node_outputs)
         condition = compiled.get("condition", "")
 
-        evaluator = Agent(
-            model=OpenAIChat(id="gpt-4o-mini"),
-            instructions=(
-                "You are a condition evaluator. Given the context and condition below, "
-                "respond with ONLY 'true' or 'false'. Nothing else.\n\n"
-                f"Condition: {condition}"
-            ),
-        )
-        resp = await evaluator.arun(upstream)
-        result = (resp.content or "").strip().lower()
-        return "true" if result.startswith("true") else "false"
+        if self._condition_evaluator:
+            # Test-injectable evaluator
+            branch = self._condition_evaluator(upstream, condition)
+        else:
+            from agno.agent import Agent
+            from agno.models.openai import OpenAIChat
+
+            evaluator = Agent(
+                model=OpenAIChat(id="gpt-4o-mini"),
+                instructions=(
+                    "You are a condition evaluator. Given the context and condition below, "
+                    "respond with ONLY 'true' or 'false'. Nothing else.\n\n"
+                    f"Condition: {condition}"
+                ),
+            )
+            resp = await evaluator.arun(upstream)
+            result = (resp.content or "").strip().lower()
+            branch = "true" if result.startswith("true") else "false"
+
+        self._branch_decisions[node_id] = branch
+        return upstream
 
     async def _execute_knowledge_base(
         self,
