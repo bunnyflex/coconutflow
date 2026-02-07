@@ -1,5 +1,12 @@
+@import "geist/font/sans.css";
+@import "geist/font/mono.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}
 
 /* Remove React Flow's default white background on built-in node types */
 .react-flow__node-input,
