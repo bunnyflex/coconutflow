@@ -5,6 +5,7 @@ import { flowApi } from '../../services/api';
 import type { InputNodeConfig } from '../../types/flow';
 import FlowManager from '../panels/FlowManager';
 import { toast } from '../ui/Toast';
+import { ShimmerButton } from '../ui/magicui/shimmer-button';
 
 export default function Toolbar() {
   const isRunning = useFlowStore((s) => s.isRunning);
@@ -74,28 +75,33 @@ export default function Toolbar() {
   return (
     <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-gray-700 bg-gray-900/90 px-3 py-2 shadow-lg backdrop-blur-sm">
       {/* Run */}
-      <button
-        onClick={handleRun}
-        disabled={isRunning || nodes.length === 0}
-        className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isRunning ? (
-          <>
-            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-            </svg>
-            Running...
-          </>
-        ) : (
-          <>
-            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.841z" />
-            </svg>
-            Run
-          </>
-        )}
-      </button>
+      {isRunning ? (
+        <button
+          disabled
+          className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white opacity-80 cursor-not-allowed"
+        >
+          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+          </svg>
+          Running...
+        </button>
+      ) : (
+        <ShimmerButton
+          onClick={handleRun}
+          disabled={nodes.length === 0}
+          shimmerColor="#a5b4fc"
+          background="rgba(79, 70, 229, 1)"
+          borderRadius="8px"
+          shimmerDuration="2.5s"
+          className="flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.841z" />
+          </svg>
+          Run
+        </ShimmerButton>
+      )}
 
       <div className="h-5 w-px bg-gray-700" />
 

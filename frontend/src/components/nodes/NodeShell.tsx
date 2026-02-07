@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { NodeStatus } from '../../types/flow';
+import { BorderBeam } from '../ui/magicui/border-beam';
 
 const STATUS_STYLES: Record<NodeStatus, string> = {
   idle: 'border-gray-600',
@@ -21,9 +22,18 @@ const STATUS_BADGES: Partial<Record<NodeStatus, ReactNode>> = {
     </span>
   ),
   running: (
-    <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
-      <span className="h-2 w-2 animate-ping rounded-full bg-white" />
-    </span>
+    <>
+      <span className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
+        <span className="h-2 w-2 animate-ping rounded-full bg-white" />
+      </span>
+      <BorderBeam
+        size={60}
+        duration={3}
+        colorFrom="#3b82f6"
+        colorTo="#6366f1"
+        borderWidth={2}
+      />
+    </>
   ),
   pending: (
     <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-500 text-xs text-gray-900">
