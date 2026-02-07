@@ -29,10 +29,15 @@ uvicorn app.main:app --reload --port 8000          # Dev server at localhost:800
 docker-compose up --build    # Frontend on :3000 (Nginx), Backend on :8000
 ```
 
-### Tests (from `backend/`)
+### Tests
 ```bash
+# Backend unit/integration tests (from backend/)
 pytest tests/ -v                                    # All unit tests (no API key needed)
 OPENAI_API_KEY=... pytest tests/test_conditional_integration.py -v  # Integration (needs key)
+
+# E2E tests with Playwright (from project root, needs both servers running)
+npx playwright test                        # Run all e2e tests
+npx playwright test e2e/chat-panel.spec.ts # Run a single test file
 ```
 
 ## Architecture
@@ -96,7 +101,11 @@ The development approach for this project is **exploratory, flow-driven**:
 5. **DIAGNOSE THE FULL PIPELINE before fixing** — trace ALL layers (frontend → WebSocket → compiler → execution engine → Agno → back) to discover hidden failures behind the first one. Don't fix one-at-a-time; find them all first.
 6. **Write ONE plan covering all discovered issues** — saved in `docs/plans/YYYY-MM-DD-<name>.md`
 7. **Execute the plan** — TDD per task (failing test → implement → pass), backend-first
-8. **Verify E2E** — re-run the ORIGINAL flow. Only mark ✅ when it works end-to-end.
+8. **Verify ALL layers (bottom-up)** — only mark ✅ when ALL pass:
+   - **Unit tests**: `cd backend && pytest tests/ -v` (fast, no API key)
+   - **Integration tests**: `OPENAI_API_KEY=... pytest tests/test_conditional_integration.py -v` (real API)
+   - **E2E tests**: `npx playwright test` (real browser + both servers running)
+   - **Manual verification**: re-run the ORIGINAL flow on canvas via Chat/Run
 9. **Move to the next flow pattern**
 
 ### Tracking Partial Progress
