@@ -110,8 +110,8 @@ class FlowWebSocket {
           cleanup();
           resolve();
         }
-        if (event.type === 'error' && !event.node_id) {
-          // Flow-level error
+        if (event.type === 'error') {
+          // Both flow-level and node-level errors end execution
           store.setIsRunning(false);
           cleanup();
           reject(new Error(event.message ?? 'Flow execution failed'));

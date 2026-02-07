@@ -29,10 +29,10 @@ uvicorn app.main:app --reload --port 8000          # Dev server at localhost:800
 docker-compose up --build    # Frontend on :3000 (Nginx), Backend on :8000
 ```
 
-### E2E Tests (from project root)
+### Tests (from `backend/`)
 ```bash
-npx playwright test                        # Run all e2e tests
-npx playwright test e2e/chat-panel.spec.ts # Run a single test file
+pytest tests/ -v                                    # All unit tests (no API key needed)
+OPENAI_API_KEY=... pytest tests/test_conditional_integration.py -v  # Integration (needs key)
 ```
 
 ## Architecture
@@ -84,6 +84,41 @@ Events streamed during execution: `node_start`, `node_output`, `node_complete`, 
 | Knowledge Base | `KnowledgeBaseNode.tsx` | `knowledge_base_compiler.py` | RAG with pgvector |
 | Conditional | `ConditionalNode.tsx` | `conditional_compiler.py` | If/else branching (LLM-evaluated) |
 | Output | `OutputNode.tsx` | `output_compiler.py` | Final output aggregation |
+
+## Development Workflow — Flow-Driven E2E Development
+
+The development approach for this project is **exploratory, flow-driven**:
+
+1. **Pick a flow pattern** — e.g., Input→Agent→Output, Conditional branching, multi-agent chaining
+2. **Build it on the canvas** in the browser UI
+3. **Run it** via Chat panel or Run button
+4. **Observe the first failure** — wrong output, errors, missing features
+5. **DIAGNOSE THE FULL PIPELINE before fixing** — trace ALL layers (frontend → WebSocket → compiler → execution engine → Agno → back) to discover hidden failures behind the first one. Don't fix one-at-a-time; find them all first.
+6. **Write ONE plan covering all discovered issues** — saved in `docs/plans/YYYY-MM-DD-<name>.md`
+7. **Execute the plan** — TDD per task (failing test → implement → pass), backend-first
+8. **Verify E2E** — re-run the ORIGINAL flow. Only mark ✅ when it works end-to-end.
+9. **Move to the next flow pattern**
+
+### Tracking Partial Progress
+Use `[~]` for half-fixed patterns. Sub-tasks show exactly where work stopped:
+```
+- [x] Conditional branching         ← done
+- [~] Knowledge Base RAG pipeline   ← HALF-FIXED
+  - [x] Backend compiler done
+  - [ ] Frontend display TODO
+- [ ] Save/Load persistence         ← not started
+```
+Plan files in `docs/plans/` are the continuity mechanism across sessions.
+
+### Tested Flow Patterns (checked = passing)
+- [x] Input → Agent → Output (basic agent call)
+- [x] Input → Web Search → Output (DuckDuckGo tool)
+- [x] Input → Conditional → Output-True / Output-False (branch skipping)
+- [x] Chat panel execution (fallback to any node output)
+- [ ] Multi-agent chaining (Agent → Agent)
+- [ ] Conditional with real LLM evaluation via Chat
+- [ ] Knowledge Base RAG pipeline
+- [ ] Save/Load flow persistence
 
 ## Key Conventions
 

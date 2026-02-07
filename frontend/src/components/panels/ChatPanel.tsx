@@ -44,11 +44,11 @@ export default function ChatPanel() {
       const flow = getFlowDefinition();
       await flowWebSocket.executeFlow(flow, text);
 
-      // After execution, find the last output from the Output node
+      // After execution, find the output — prefer Output nodes, fall back to any node with output
       const store = useFlowStore.getState();
-      const outputNode = store.nodes.find(
-        (n) => n.data.nodeType === 'output' && n.data.output,
-      );
+      const outputNode =
+        store.nodes.find((n) => n.data.nodeType === 'output' && n.data.output) ??
+        [...store.nodes].reverse().find((n) => n.data.output);
       const assistantResponse =
         outputNode?.data.output ?? 'No output received.';
       addMessage('assistant', assistantResponse);
