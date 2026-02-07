@@ -6,6 +6,7 @@ import { cn } from "../../../lib/utils";
 
 interface MagicCardProps {
   children?: React.ReactNode;
+  handles?: React.ReactNode;
   className?: string;
   gradientSize?: number;
   gradientColor?: string;
@@ -16,6 +17,7 @@ interface MagicCardProps {
 
 export function MagicCard({
   children,
+  handles,
   className,
   gradientSize = 150,
   gradientColor = "#1e1b4b",
@@ -69,6 +71,8 @@ export function MagicCard({
       />
       {/* Content */}
       <div className="relative">{children}</div>
+      {/* Handles rendered at outer div level for correct absolute positioning */}
+      {handles}
     </div>
   );
 }

@@ -36,6 +36,14 @@ export default function OutputNode({ data }: { data: FlowNodeData }) {
       status={data.status}
       subtitle={config.display_format}
       error={data.error}
+      handles={
+        <Handle
+          type="target"
+          position={Position.Left}
+          id="input"
+          className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
+        />
+      }
     >
       <div className="relative">
         {data.output ? (
@@ -82,12 +90,6 @@ export default function OutputNode({ data }: { data: FlowNodeData }) {
           <div className="text-xs text-gray-500 italic">Waiting for output...</div>
         )}
       </div>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input"
-        className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
-      />
     </NodeShell>
   );
 }

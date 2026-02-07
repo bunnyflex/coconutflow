@@ -15,9 +15,25 @@ export default function LLMAgentNode({ data }: { data: FlowNodeData }) {
       status={data.status}
       subtitle={`${config.model_provider} / ${config.model_id}`}
       error={data.error}
+      handles={
+        <>
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="input"
+            className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="output"
+            className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
+          />
+        </>
+      }
     >
       {config.instructions && (
-        <div className="text-xs text-gray-400 italic truncate max-w-[160px]">
+        <div className="text-xs text-gray-400 italic truncate">
           {config.instructions}
         </div>
       )}
@@ -30,18 +46,6 @@ export default function LLMAgentNode({ data }: { data: FlowNodeData }) {
           ))}
         </div>
       )}
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input"
-        className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output"
-        className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
-      />
     </NodeShell>
   );
 }

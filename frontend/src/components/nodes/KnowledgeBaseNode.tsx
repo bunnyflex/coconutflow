@@ -15,6 +15,22 @@ export default function KnowledgeBaseNode({ data }: { data: FlowNodeData }) {
       status={data.status}
       subtitle={`${config.files.length} file${config.files.length !== 1 ? 's' : ''}`}
       error={data.error}
+      handles={
+        <>
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="input"
+            className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="output"
+            className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
+          />
+        </>
+      }
     >
       {config.files.length > 0 ? (
         <div className="flex flex-col gap-0.5">
@@ -30,18 +46,6 @@ export default function KnowledgeBaseNode({ data }: { data: FlowNodeData }) {
       ) : (
         <div className="text-xs text-gray-500 italic">No files uploaded</div>
       )}
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input"
-        className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output"
-        className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
-      />
     </NodeShell>
   );
 }

@@ -75,22 +75,24 @@ interface NodeShellProps {
   nodeType?: NodeType;
   subtitle?: string;
   children?: ReactNode;
+  handles?: ReactNode;
   error?: string;
 }
 
-export default function NodeShell({ icon, label, status, nodeType = 'llm_agent', subtitle, children, error }: NodeShellProps) {
+export default function NodeShell({ icon, label, status, nodeType = 'llm_agent', subtitle, children, handles, error }: NodeShellProps) {
   const accent = NODE_ACCENT[nodeType];
 
   return (
     <MagicCard
-      className={`rounded-xl border ${STATUS_BORDER[status]} transition-all duration-300`}
+      className={`min-w-44 max-w-xs rounded-xl border ${STATUS_BORDER[status]} transition-all duration-300`}
       gradientSize={200}
       gradientColor={accent.gradient + '20'}
       gradientFrom={accent.gradient}
       gradientTo={accent.gradient + '60'}
       gradientOpacity={0.5}
+      handles={handles}
     >
-      <div className="relative min-w-[180px]">
+      <div className="relative">
         {STATUS_BADGES[status]}
 
         {/* Header */}
@@ -98,7 +100,7 @@ export default function NodeShell({ icon, label, status, nodeType = 'llm_agent',
           <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${accent.bg}`}>
             <span className={`flex items-center ${accent.text}`}>{icon}</span>
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 text-left">
             <div className="text-sm font-semibold text-gray-100">{label}</div>
             {subtitle && (
               <div className="truncate text-xs text-gray-500">{subtitle}</div>

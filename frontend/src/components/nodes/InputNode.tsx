@@ -8,16 +8,25 @@ export default function InputNode({ data }: { data: FlowNodeData }) {
   const config = data.config as InputNodeConfig;
 
   return (
-    <NodeShell icon={<ArrowDownToLine className="h-4 w-4" />} label={data.label} status={data.status} nodeType="input" subtitle={config.input_type} error={data.error}>
-      <div className="text-xs text-gray-400 italic truncate max-w-[160px]">
+    <NodeShell
+      icon={<ArrowDownToLine className="h-4 w-4" />}
+      label={data.label}
+      status={data.status}
+      nodeType="input"
+      subtitle={config.input_type}
+      error={data.error}
+      handles={
+        <Handle
+          type="source"
+          position={Position.Right}
+          id="output"
+          className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
+        />
+      }
+    >
+      <div className="text-xs text-gray-400 italic truncate">
         {config.value || config.placeholder}
       </div>
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output"
-        className="!h-3 !w-3 !border-2 !border-gray-600 !bg-indigo-400"
-      />
     </NodeShell>
   );
 }

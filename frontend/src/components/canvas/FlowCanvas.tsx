@@ -14,9 +14,12 @@ import 'reactflow/dist/style.css';
 import { useFlowStore, type FlowNodeData } from '../../store/flowStore';
 import type { NodeType, NodeStatus } from '../../types/flow';
 import { nodeTypes } from '../nodes';
+import AnimatedBeamEdge from '../edges/AnimatedBeamEdge';
 import Toolbar from './Toolbar';
 import ContextMenu from './ContextMenu';
 import { Particles } from '../ui/magicui/particles';
+
+const edgeTypes = { animatedBeam: AnimatedBeamEdge };
 
 // Nodes that can only be sources (no input handle)
 const SOURCE_ONLY: Set<NodeType> = new Set(['input']);
@@ -62,41 +65,42 @@ export default function FlowCanvas() {
     return map;
   }, [nodes]);
 
-  // Style edges based on execution state
+  // Style edges based on execution state — always use animatedBeam type
   const styledEdges: Edge[] = useMemo(() => {
     if (!isRunning && !nodes.some((n) => (n.data as FlowNodeData).status !== 'idle')) {
-      return edges;
+      return edges.map((e) => ({ ...e, type: 'animatedBeam' }));
     }
     return edges.map((edge) => {
       const sourceStatus = nodeStatusMap.get(edge.source);
       const targetStatus = nodeStatusMap.get(edge.target);
+      const base = { ...edge, type: 'animatedBeam' as const };
 
       if (sourceStatus === 'running' || targetStatus === 'running') {
         return {
-          ...edge,
+          ...base,
           animated: true,
           style: { stroke: '#3b82f6', strokeWidth: 2 },
         };
       }
       if (sourceStatus === 'completed' && targetStatus === 'completed') {
         return {
-          ...edge,
+          ...base,
           style: { stroke: '#22c55e', strokeWidth: 2 },
         };
       }
       if (sourceStatus === 'completed') {
         return {
-          ...edge,
+          ...base,
           style: { stroke: '#6366f1', strokeWidth: 2 },
         };
       }
       if (sourceStatus === 'error' || targetStatus === 'error') {
         return {
-          ...edge,
+          ...base,
           style: { stroke: '#ef4444', strokeWidth: 2 },
         };
       }
-      return edge;
+      return base;
     });
   }, [edges, nodeStatusMap, isRunning, nodes]);
 
@@ -211,9 +215,10 @@ export default function FlowCanvas() {
         onPaneClick={onPaneClick}
         onNodeContextMenu={onNodeContextMenu}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         defaultEdgeOptions={{
           style: { stroke: '#6366f1', strokeWidth: 1.5 },
-          type: 'smoothstep',
+          type: 'animatedBeam',
         }}
         defaultViewport={{ x: 0, y: 0, zoom: 0.75 }}
         fitView

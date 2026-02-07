@@ -71,6 +71,7 @@
   }
 }
 
+
 /* MagicUI Animation Utilities */
 @utility animate-shimmer-slide {
   animation: shimmer-slide var(--speed) ease-in-out infinite alternate;
@@ -91,3 +92,4 @@
 @utility animate-blink-cursor {
   animation: blink-cursor 1.2s step-end infinite;
 }
+
