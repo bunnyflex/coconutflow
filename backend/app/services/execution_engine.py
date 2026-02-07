@@ -59,6 +59,9 @@ def _get_upstream_output(
 class ExecutionEngine:
     """Executes a compiled flow graph and yields streaming events."""
 
+    def __init__(self, condition_evaluator=None):
+        self._condition_evaluator = condition_evaluator
+
     async def execute(
         self,
         execution_graph: dict[str, Any],
@@ -70,12 +73,20 @@ class ExecutionEngine:
         edges: list[dict[str, Any]] = execution_graph.get("edges", [])
 
         node_outputs: dict[str, str] = {}
+        self._branch_decisions: dict[str, str] = {}
+        skipped_nodes: set[str] = set()
 
         yield ExecutionEvent(event_type="flow_start", flow_id=flow_id)
 
         for node_id in execution_order:
             compiled = compiled_nodes.get(node_id, {})
             node_type = compiled.get("node_type", "unknown")
+
+            # Check if this node should be skipped due to branching
+            if self._should_skip(node_id, edges, skipped_nodes):
+                skipped_nodes.add(node_id)
+                yield ExecutionEvent(event_type="node_skipped", node_id=node_id, flow_id=flow_id)
+                continue
 
             yield ExecutionEvent(event_type="node_start", node_id=node_id, flow_id=flow_id)
 
@@ -108,6 +119,42 @@ class ExecutionEngine:
             flow_id=flow_id,
             data=node_outputs.get(execution_order[-1], "") if execution_order else "",
         )
+
+    def _should_skip(
+        self,
+        node_id: str,
+        edges: list[dict[str, Any]],
+        skipped_nodes: set[str],
+    ) -> bool:
+        """Check if a node should be skipped because it's on a non-taken branch.
+
+        A node is skipped if ALL its incoming edges come from either:
+        1. A conditional node via the non-taken branch handle, or
+        2. An already-skipped node (cascading skip).
+        """
+        incoming = [e for e in edges if e["target"] == node_id]
+        if not incoming:
+            return False  # Root nodes always run
+
+        for edge in incoming:
+            source = edge["source"]
+            source_handle = edge.get("source_handle")
+
+            # If any incoming edge is from a non-skipped, non-conditional source, run the node
+            if source not in self._branch_decisions and source not in skipped_nodes:
+                return False
+
+            # If source is a conditional, check if this edge is on the taken branch
+            if source in self._branch_decisions:
+                taken_branch = self._branch_decisions[source]
+                if source_handle == taken_branch or source_handle is None:
+                    return False  # This edge is on the taken branch
+
+            # If source was skipped, this edge doesn't count as "live"
+            # Continue checking other edges
+
+        # All incoming edges are from skipped nodes or non-taken branches
+        return True
 
     async def _execute_node(
         self,
