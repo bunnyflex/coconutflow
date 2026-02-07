@@ -1,0 +1,7 @@
+agno[openai,anthropic,google,ddg,pgvector,pdf]
+fastapi[all]
+uvicorn[standard]
+websockets
+supabase
+python-multipart
+python-dotenv
