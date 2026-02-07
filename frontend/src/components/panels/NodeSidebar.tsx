@@ -1,5 +1,6 @@
 import { type DragEvent, useState } from 'react';
 import { NODE_TYPE_CATALOG, type NodeTypeInfo, type NodeType } from '../../types/flow';
+import { MagicCard } from '../ui/magicui/magic-card';
 
 const CATEGORY_LABELS: Record<string, string> = {
   input_output: 'Input / Output',
@@ -16,17 +17,26 @@ function DraggableNode({ info }: { info: NodeTypeInfo }) {
   };
 
   return (
-    <div
-      draggable
-      onDragStart={(e) => onDragStart(e, info.type)}
-      className="flex cursor-grab items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 transition-colors hover:border-indigo-500 hover:bg-gray-750 active:cursor-grabbing"
+    <MagicCard
+      className="rounded-lg border border-gray-700"
+      gradientSize={120}
+      gradientColor="#1e1b4b"
+      gradientFrom="#6366f1"
+      gradientTo="#3b82f6"
+      gradientOpacity={0.6}
     >
-      <span className="text-lg">{info.icon}</span>
-      <div className="min-w-0">
-        <div className="text-sm font-medium text-gray-200">{info.label}</div>
-        <div className="truncate text-xs text-gray-500">{info.description}</div>
+      <div
+        draggable
+        onDragStart={(e) => onDragStart(e, info.type)}
+        className="flex cursor-grab items-center gap-3 px-3 py-2.5 active:cursor-grabbing"
+      >
+        <span className="text-lg">{info.icon}</span>
+        <div className="min-w-0">
+          <div className="text-sm font-medium text-gray-200">{info.label}</div>
+          <div className="truncate text-xs text-gray-500">{info.description}</div>
+        </div>
       </div>
-    </div>
+    </MagicCard>
   );
 }
 

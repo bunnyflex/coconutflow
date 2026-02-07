@@ -3,6 +3,7 @@ import { MarkdownHooks as Markdown } from 'react-markdown';
 import { useFlowStore } from '../../store/flowStore';
 import { flowWebSocket } from '../../services/websocket';
 import { toast } from '../ui/Toast';
+import { TypingAnimation } from '../ui/magicui/typing-animation';
 import type { ChatMessage } from '../../types/flow';
 
 export default function ChatPanel() {
@@ -93,8 +94,12 @@ export default function ChatPanel() {
             </p>
           </div>
         )}
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} />
+        {messages.map((msg, idx) => (
+          <MessageBubble
+            key={msg.id}
+            message={msg}
+            isLatest={msg.role === 'assistant' && idx === messages.length - 1}
+          />
         ))}
         {isRunning && (
           <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -132,7 +137,7 @@ export default function ChatPanel() {
   );
 }
 
-function MessageBubble({ message }: { message: ChatMessage }) {
+function MessageBubble({ message, isLatest = false }: { message: ChatMessage; isLatest?: boolean }) {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
 
@@ -149,6 +154,10 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       >
         {isUser ? (
           <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        ) : isSystem ? (
+          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        ) : isLatest ? (
+          <TypingAnimation text={message.content} speed={12} />
         ) : (
           <div className="prose prose-sm prose-invert max-w-none break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_li]:my-0.5 [&_ol]:my-1 [&_ul]:my-1 [&_p]:my-1">
             <Markdown>{message.content}</Markdown>
