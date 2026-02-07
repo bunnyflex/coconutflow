@@ -1,4 +1,4 @@
-"""Tests for the execution engine — conditional branching."""
+"""Tests for the execution engine — conditional branching and multi-agent chaining."""
 
 import pytest
 from app.services.execution_engine import ExecutionEngine
@@ -100,3 +100,69 @@ async def test_conditional_skips_false_branch():
     skipped = [e for e in events if e["type"] == "node_skipped"]
     assert any(e["node_id"] == "output-false" for e in skipped), \
         "Should emit node_skipped for false-branch nodes"
+
+
+@pytest.mark.asyncio
+async def test_multi_agent_chaining():
+    """Agent nodes should pass their output as context to downstream agents."""
+    engine = ExecutionEngine()
+
+    # Graph: Input -> Agent1 (Research) -> Agent2 (Summarize) -> Output
+    # Agent1 and Agent2 are mocked as input nodes for testing without OpenAI
+    execution_graph = {
+        "flow_id": "test-multi-agent",
+        "execution_order": ["input-1", "agent-1", "agent-2", "output-1"],
+        "compiled_nodes": {
+            "input-1": {"node_id": "input-1", "node_type": "input"},
+            # Mock Agent1 as an input node that produces research facts
+            "agent-1": {
+                "node_id": "agent-1",
+                "node_type": "input",
+                "value": "Fact 1: AI improves diagnostics. Fact 2: AI reduces costs. Fact 3: AI enables personalized medicine.",
+            },
+            # Mock Agent2 as an input node that would receive Agent1's output
+            "agent-2": {
+                "node_id": "agent-2",
+                "node_type": "input",
+                "value": "AI transforms healthcare through better diagnostics and personalization.",
+            },
+            "output-1": {"node_id": "output-1", "node_type": "output"},
+        },
+        "edges": [
+            {"id": "e1", "source": "input-1", "target": "agent-1"},
+            {"id": "e2", "source": "agent-1", "target": "agent-2"},
+            {"id": "e3", "source": "agent-2", "target": "output-1"},
+        ],
+    }
+
+    events = []
+    # Pass empty user_input so mock agents use their "value" field instead
+    async for event in engine.execute(execution_graph, user_input=""):
+        events.append(event.to_dict())
+
+    # Verify Agent1 executed and produced output
+    agent1_output = next(
+        (e for e in events if e["type"] == "node_output" and e["node_id"] == "agent-1"),
+        None,
+    )
+    assert agent1_output is not None, "Agent1 should have produced output"
+    assert "diagnostics" in agent1_output["data"].lower(), \
+        "Agent1 should output research facts"
+
+    # Verify Agent2 executed and produced output
+    agent2_output = next(
+        (e for e in events if e["type"] == "node_output" and e["node_id"] == "agent-2"),
+        None,
+    )
+    assert agent2_output is not None, "Agent2 should have produced output"
+    assert "transforms" in agent2_output["data"].lower(), \
+        "Agent2 should output summary"
+
+    # Verify final output contains Agent2's result
+    final_output = next(
+        (e for e in events if e["type"] == "flow_complete"),
+        None,
+    )
+    assert final_output is not None, "Flow should complete"
+    assert "transforms" in final_output["data"].lower(), \
+        "Final output should contain Agent2's summary"
