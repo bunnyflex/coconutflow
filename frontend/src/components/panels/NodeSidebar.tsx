@@ -12,7 +12,7 @@ const CATEGORY_ORDER = ['input_output', 'processing', 'tools'] as const;
 
 function DraggableNode({ info }: { info: NodeTypeInfo }) {
   const onDragStart = (event: DragEvent, nodeType: NodeType) => {
-    event.dataTransfer.setData('application/agnoflow-node', nodeType);
+    event.dataTransfer.setData('application/coconutflow-node', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
 
@@ -59,7 +59,7 @@ export default function NodeSidebar() {
     <aside className="flex w-60 flex-col border-r border-gray-800 bg-gray-900">
       {/* Header */}
       <div className="border-b border-gray-800 px-4 py-3">
-        <h1 className="text-lg font-bold tracking-tight text-white">AgnoFlow</h1>
+        <h1 className="text-lg font-bold tracking-tight text-white">CoconutFlow</h1>
         <p className="text-xs text-gray-500">Visual Agent Builder</p>
       </div>
 

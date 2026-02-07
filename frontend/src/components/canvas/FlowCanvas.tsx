@@ -141,7 +141,7 @@ export default function FlowCanvas() {
     (event: DragEvent) => {
       event.preventDefault();
 
-      const nodeType = event.dataTransfer.getData('application/agnoflow-node') as NodeType;
+      const nodeType = event.dataTransfer.getData('application/coconutflow-node') as NodeType;
       if (!nodeType) return;
 
       const instance = reactFlowInstance.current;

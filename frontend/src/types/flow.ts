@@ -1,6 +1,6 @@
 import React from 'react';
 
-// AgnoFlow TypeScript types — matches PRD Section 10 Flow JSON Schema
+// CoconutFlow TypeScript types — matches PRD Section 10 Flow JSON Schema
 // and aligns with backend Pydantic models in app/models/flow.py
 
 // ---------------------------------------------------------------------------
