@@ -215,7 +215,11 @@ export default function FlowCanvas() {
           style: { stroke: '#6366f1', strokeWidth: 1.5 },
           type: 'smoothstep',
         }}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.75 }}
         fitView
+        fitViewOptions={{ maxZoom: 0.85, padding: 0.3 }}
+        minZoom={0.2}
+        maxZoom={1.5}
         deleteKeyCode={['Backspace', 'Delete']}
         className="bg-gray-950/80"
       >
