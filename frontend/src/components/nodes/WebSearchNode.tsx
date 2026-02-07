@@ -9,7 +9,8 @@ export default function WebSearchNode({ data }: { data: FlowNodeData }) {
 
   return (
     <NodeShell
-      icon={<Globe className="h-4 w-4 text-gray-400" />}
+      icon={<Globe className="h-4 w-4" />}
+      nodeType="web_search"
       label={data.label}
       status={data.status}
       subtitle={`${config.result_count} results`}

@@ -30,7 +30,8 @@ export default function OutputNode({ data }: { data: FlowNodeData }) {
 
   return (
     <NodeShell
-      icon={<ArrowUpFromLine className="h-4 w-4 text-gray-400" />}
+      icon={<ArrowUpFromLine className="h-4 w-4" />}
+      nodeType="output"
       label={data.label}
       status={data.status}
       subtitle={config.display_format}

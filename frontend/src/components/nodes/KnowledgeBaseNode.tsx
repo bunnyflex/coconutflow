@@ -9,7 +9,8 @@ export default function KnowledgeBaseNode({ data }: { data: FlowNodeData }) {
 
   return (
     <NodeShell
-      icon={<BookOpen className="h-4 w-4 text-gray-400" />}
+      icon={<BookOpen className="h-4 w-4" />}
+      nodeType="knowledge_base"
       label={data.label}
       status={data.status}
       subtitle={`${config.files.length} file${config.files.length !== 1 ? 's' : ''}`}

@@ -8,7 +8,7 @@ export default function InputNode({ data }: { data: FlowNodeData }) {
   const config = data.config as InputNodeConfig;
 
   return (
-    <NodeShell icon={<ArrowDownToLine className="h-4 w-4 text-gray-400" />} label={data.label} status={data.status} subtitle={config.input_type} error={data.error}>
+    <NodeShell icon={<ArrowDownToLine className="h-4 w-4" />} label={data.label} status={data.status} nodeType="input" subtitle={config.input_type} error={data.error}>
       <div className="text-xs text-gray-400 italic truncate max-w-[160px]">
         {config.value || config.placeholder}
       </div>

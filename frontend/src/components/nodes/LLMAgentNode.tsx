@@ -9,7 +9,8 @@ export default function LLMAgentNode({ data }: { data: FlowNodeData }) {
 
   return (
     <NodeShell
-      icon={<Bot className="h-4 w-4 text-gray-400" />}
+      icon={<Bot className="h-4 w-4" />}
+      nodeType="llm_agent"
       label={data.label}
       status={data.status}
       subtitle={`${config.model_provider} / ${config.model_id}`}

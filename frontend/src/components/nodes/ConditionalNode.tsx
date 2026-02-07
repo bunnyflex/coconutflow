@@ -8,7 +8,7 @@ export default function ConditionalNode({ data }: { data: FlowNodeData }) {
   const config = data.config as ConditionalNodeConfig;
 
   return (
-    <NodeShell icon={<GitBranch className="h-4 w-4 text-gray-400" />} label={data.label} status={data.status} error={data.error}>
+    <NodeShell icon={<GitBranch className="h-4 w-4" />} label={data.label} status={data.status} nodeType="conditional" error={data.error}>
       {config.condition ? (
         <div className="text-xs text-gray-400 italic truncate max-w-[160px]">
           {config.condition}
