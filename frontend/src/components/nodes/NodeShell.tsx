@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { NodeStatus, NodeType } from '../../types/flow';
 import { MagicCard } from '../ui/magicui/magic-card';
-import { BorderBeam } from '../ui/magicui/border-beam';
+
 
 // Accent colors per node type
 const NODE_ACCENT: Record<NodeType, { bg: string; text: string; gradient: string }> = {
@@ -33,18 +33,9 @@ const STATUS_BADGES: Partial<Record<NodeStatus, ReactNode>> = {
     </span>
   ),
   running: (
-    <>
-      <span className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
-        <span className="h-2 w-2 animate-ping rounded-full bg-white" />
-      </span>
-      <BorderBeam
-        size={60}
-        duration={3}
-        colorFrom="#3b82f6"
-        colorTo="#6366f1"
-        borderWidth={2}
-      />
-    </>
+    <span className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
+      <span className="h-2 w-2 animate-ping rounded-full bg-white" />
+    </span>
   ),
   pending: (
     <span className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-500 text-xs text-gray-900 shadow-sm">
