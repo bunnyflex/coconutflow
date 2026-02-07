@@ -136,3 +136,4 @@ Plan files in `docs/plans/` are the continuity mechanism across sessions.
 - **LLM providers**: OpenAI, Anthropic, Google, Groq, Ollama — configured via environment variables and selectable per-agent node.
 - **Flow storage is in-memory** on the backend (dict-based). Supabase persistence is planned but not yet wired.
 - **CORS is wide open** in `backend/app/main.py` — needs lockdown for production.
+- **Git commits**: Do NOT include "Co-Authored-By: Claude" in commit messages. All commits should be attributed solely to the human developer.
