@@ -1,3 +1,5 @@
+import React from 'react';
+
 // AgnoFlow TypeScript types — matches PRD Section 10 Flow JSON Schema
 // and aligns with backend Pydantic models in app/models/flow.py
 
@@ -217,51 +219,55 @@ export interface NodeTypeInfo {
   type: NodeType;
   label: string;
   description: string;
-  icon: string;
+  icon: React.ReactNode;
   category: 'input_output' | 'processing' | 'tools';
 }
+
+import { ArrowDownToLine, ArrowUpFromLine, Bot, GitBranch, Globe, BookOpen } from 'lucide-react';
+
+const ic = (C: React.FC<{ className?: string }>) => React.createElement(C, { className: 'h-5 w-5 text-gray-400' });
 
 export const NODE_TYPE_CATALOG: NodeTypeInfo[] = [
   {
     type: 'input',
     label: 'Input',
     description: 'Entry point for user data',
-    icon: '📥',
+    icon: ic(ArrowDownToLine),
     category: 'input_output',
   },
   {
     type: 'output',
     label: 'Output',
     description: 'Displays the final result',
-    icon: '📤',
+    icon: ic(ArrowUpFromLine),
     category: 'input_output',
   },
   {
     type: 'llm_agent',
     label: 'LLM Agent',
     description: 'Core AI processing node',
-    icon: '🤖',
+    icon: ic(Bot),
     category: 'processing',
   },
   {
     type: 'conditional',
     label: 'Conditional',
     description: 'If/else branching',
-    icon: '🔀',
+    icon: ic(GitBranch),
     category: 'processing',
   },
   {
     type: 'web_search',
     label: 'Web Search',
     description: 'Search the web for results',
-    icon: '🔍',
+    icon: ic(Globe),
     category: 'tools',
   },
   {
     type: 'knowledge_base',
     label: 'Knowledge Base',
     description: 'Upload documents for RAG',
-    icon: '📚',
+    icon: ic(BookOpen),
     category: 'tools',
   },
 ];

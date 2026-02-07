@@ -1,4 +1,5 @@
 import { Handle, Position } from 'reactflow';
+import { ArrowDownToLine } from 'lucide-react';
 import type { FlowNodeData } from '../../store/flowStore';
 import type { InputNodeConfig } from '../../types/flow';
 import NodeShell from './NodeShell';
@@ -7,7 +8,7 @@ export default function InputNode({ data }: { data: FlowNodeData }) {
   const config = data.config as InputNodeConfig;
 
   return (
-    <NodeShell icon="📥" label={data.label} status={data.status} subtitle={config.input_type} error={data.error}>
+    <NodeShell icon={<ArrowDownToLine className="h-4 w-4 text-gray-400" />} label={data.label} status={data.status} subtitle={config.input_type} error={data.error}>
       <div className="text-xs text-gray-400 italic truncate max-w-[160px]">
         {config.value || config.placeholder}
       </div>

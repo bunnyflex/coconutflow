@@ -58,7 +58,7 @@ const STATUS_LABELS: Partial<Record<NodeStatus, ReactNode>> = {
 };
 
 interface NodeShellProps {
-  icon: string;
+  icon: ReactNode;
   label: string;
   status: NodeStatus;
   subtitle?: string;
@@ -75,7 +75,7 @@ export default function NodeShell({ icon, label, status, subtitle, children, err
 
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-gray-700 px-3 py-2">
-        <span className="text-base">{icon}</span>
+        <span className="flex items-center">{icon}</span>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-semibold text-gray-100">{label}</div>
           {subtitle && (

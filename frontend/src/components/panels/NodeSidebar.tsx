@@ -30,7 +30,7 @@ function DraggableNode({ info }: { info: NodeTypeInfo }) {
         onDragStart={(e) => onDragStart(e, info.type)}
         className="flex cursor-grab items-center gap-3 px-3 py-2.5 active:cursor-grabbing"
       >
-        <span className="text-lg">{info.icon}</span>
+        <span className="flex items-center">{info.icon}</span>
         <div className="min-w-0">
           <div className="text-sm font-medium text-gray-200">{info.label}</div>
           <div className="truncate text-xs text-gray-500">{info.description}</div>

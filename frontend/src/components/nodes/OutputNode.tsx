@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Handle, Position } from 'reactflow';
+import { ArrowUpFromLine } from 'lucide-react';
 import type { FlowNodeData } from '../../store/flowStore';
 import type { OutputNodeConfig } from '../../types/flow';
 import NodeShell from './NodeShell';
@@ -29,7 +30,7 @@ export default function OutputNode({ data }: { data: FlowNodeData }) {
 
   return (
     <NodeShell
-      icon="📤"
+      icon={<ArrowUpFromLine className="h-4 w-4 text-gray-400" />}
       label={data.label}
       status={data.status}
       subtitle={config.display_format}

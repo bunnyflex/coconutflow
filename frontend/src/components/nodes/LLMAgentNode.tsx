@@ -1,4 +1,5 @@
 import { Handle, Position } from 'reactflow';
+import { Bot } from 'lucide-react';
 import type { FlowNodeData } from '../../store/flowStore';
 import type { LLMAgentNodeConfig } from '../../types/flow';
 import NodeShell from './NodeShell';
@@ -8,7 +9,7 @@ export default function LLMAgentNode({ data }: { data: FlowNodeData }) {
 
   return (
     <NodeShell
-      icon="🤖"
+      icon={<Bot className="h-4 w-4 text-gray-400" />}
       label={data.label}
       status={data.status}
       subtitle={`${config.model_provider} / ${config.model_id}`}

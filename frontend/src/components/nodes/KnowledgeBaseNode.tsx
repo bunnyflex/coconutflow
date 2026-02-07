@@ -1,4 +1,5 @@
 import { Handle, Position } from 'reactflow';
+import { BookOpen } from 'lucide-react';
 import type { FlowNodeData } from '../../store/flowStore';
 import type { KnowledgeBaseNodeConfig } from '../../types/flow';
 import NodeShell from './NodeShell';
@@ -8,7 +9,7 @@ export default function KnowledgeBaseNode({ data }: { data: FlowNodeData }) {
 
   return (
     <NodeShell
-      icon="📚"
+      icon={<BookOpen className="h-4 w-4 text-gray-400" />}
       label={data.label}
       status={data.status}
       subtitle={`${config.files.length} file${config.files.length !== 1 ? 's' : ''}`}
