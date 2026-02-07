@@ -46,3 +46,55 @@ async def test_conditional_passes_upstream_data():
     assert output_event["data"] != "true", "Conditional should not replace data with 'true'"
     assert "sunny" in output_event["data"].lower() or "25" in output_event["data"], \
         "Output should contain upstream agent content"
+
+
+@pytest.mark.asyncio
+async def test_conditional_skips_false_branch():
+    """Nodes on the non-taken branch should be skipped entirely."""
+    engine = ExecutionEngine()
+
+    # Graph: Input -> Conditional -> (true) Output-True
+    #                              -> (false) Output-False
+    # The conditional evaluates to true, so Output-False should be skipped.
+    execution_graph = {
+        "flow_id": "test-branch-skip",
+        "execution_order": ["input-1", "cond-1", "output-true", "output-false"],
+        "compiled_nodes": {
+            "input-1": {"node_id": "input-1", "node_type": "input"},
+            "cond-1": {
+                "node_id": "cond-1",
+                "node_type": "conditional",
+                "condition": "The input is not empty",
+            },
+            "output-true": {"node_id": "output-true", "node_type": "output"},
+            "output-false": {"node_id": "output-false", "node_type": "output"},
+        },
+        "edges": [
+            {"id": "e1", "source": "input-1", "target": "cond-1"},
+            {"id": "e2", "source": "cond-1", "source_handle": "true", "target": "output-true"},
+            {"id": "e3", "source": "cond-1", "source_handle": "false", "target": "output-false"},
+        ],
+    }
+
+    events = []
+    async for event in engine.execute(execution_graph, user_input="hello"):
+        events.append(event.to_dict())
+
+    # Output-True should have executed
+    true_output = next(
+        (e for e in events if e["type"] == "node_output" and e["node_id"] == "output-true"),
+        None,
+    )
+    assert true_output is not None, "True-branch output should have executed"
+
+    # Output-False should NOT have executed
+    false_output = next(
+        (e for e in events if e["type"] == "node_output" and e["node_id"] == "output-false"),
+        None,
+    )
+    assert false_output is None, "False-branch output should have been skipped"
+
+    # A node_skipped event should be emitted for the false branch
+    skipped = [e for e in events if e["type"] == "node_skipped"]
+    assert any(e["node_id"] == "output-false" for e in skipped), \
+        "Should emit node_skipped for false-branch nodes"
