@@ -1,5 +1,5 @@
-@import "geist/font/sans.css";
-@import "geist/font/mono.css";
+@import "@fontsource/geist-sans";
+@import "@fontsource/geist-mono";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
