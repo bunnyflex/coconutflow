@@ -145,6 +145,12 @@ class FlowWebSocket {
         }
         break;
 
+      case 'node_skipped':
+        if (event.node_id) {
+          store.updateNodeStatus(event.node_id, 'completed' as NodeStatus);
+        }
+        break;
+
       case 'error':
         if (event.node_id) {
           store.updateNodeStatus(
