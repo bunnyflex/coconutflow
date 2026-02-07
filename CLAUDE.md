@@ -124,7 +124,7 @@ Plan files in `docs/plans/` are the continuity mechanism across sessions.
 - [x] Input → Web Search → Output (DuckDuckGo tool)
 - [x] Input → Conditional → Output-True / Output-False (branch skipping)
 - [x] Chat panel execution (fallback to any node output)
-- [ ] Multi-agent chaining (Agent → Agent)
+- [x] Multi-agent chaining (Agent → Agent) - unit test passes, upstream context flows correctly
 - [ ] Conditional with real LLM evaluation via Chat
 - [ ] Knowledge Base RAG pipeline
 - [ ] Save/Load flow persistence
