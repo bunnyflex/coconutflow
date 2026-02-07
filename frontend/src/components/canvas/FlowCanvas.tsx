@@ -208,6 +208,7 @@ export default function FlowCanvas() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         isValidConnection={isValidConnection}
+        connectionRadius={50}
         onInit={onInit}
         onDrop={onDrop}
         onDragOver={onDragOver}
