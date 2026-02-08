@@ -171,3 +171,30 @@ class TestFileUploadValidation:
         assert "warnings" in data
         assert len(data["warnings"]) > 0
         assert "large" in data["warnings"][0].lower()
+
+
+class TestPowerPointUpload:
+    """Test PowerPoint file upload support."""
+
+    def test_upload_pptx_file(self, client):
+        """PowerPoint files should be accepted."""
+        # Create minimal valid PPTX (ZIP archive with required structure)
+        import zipfile
+        import io
+
+        pptx_buffer = io.BytesIO()
+        with zipfile.ZipFile(pptx_buffer, 'w') as zf:
+            zf.writestr('[Content_Types].xml', '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>')
+            zf.writestr('_rels/.rels', '<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>')
+
+        pptx_content = pptx_buffer.getvalue()
+
+        response = client.post(
+            "/api/upload/",
+            files={"file": ("test.pptx", pptx_content, "application/vnd.openxmlformats-officedocument.presentationml.presentation")},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["extension"] == ".pptx"
+        assert data["file_type"] == "text"  # Validated as readable

@@ -1,5 +1,6 @@
 """File upload validation for Knowledge Base documents."""
 from typing import Dict, List, Any
+import os
 
 
 class ValidationError(Exception):
@@ -12,6 +13,9 @@ class FileValidator:
 
     SIZE_WARNING_THRESHOLD = 10 * 1024 * 1024  # 10 MB
     MIN_SIZE = 1  # At least 1 byte
+
+    # Binary document formats that are valid even though they're not text
+    BINARY_DOCUMENT_FORMATS = {".pdf", ".docx", ".pptx"}
 
     def __init__(self, content: bytes, filename: str):
         self.content = content
@@ -40,13 +44,20 @@ class FileValidator:
             result["error"] = "File is empty"
             return result
 
-        # Check if readable text
-        if not self._is_text():
-            result["valid"] = False
-            result["error"] = "File is not readable text"
-            return result
+        # Get file extension
+        ext = os.path.splitext(self.filename)[1].lower()
 
-        result["file_type"] = "text"
+        # Binary document formats are valid without text check
+        if ext in self.BINARY_DOCUMENT_FORMATS:
+            result["file_type"] = "text"  # Treated as text for RAG purposes
+        else:
+            # Check if readable text
+            if not self._is_text():
+                result["valid"] = False
+                result["error"] = "File is not readable text"
+                return result
+
+            result["file_type"] = "text"
 
         # Size warning
         if len(self.content) > self.SIZE_WARNING_THRESHOLD:

@@ -19,7 +19,7 @@ router = APIRouter(prefix="/api/upload", tags=["upload"])
 UPLOAD_DIR = Path(__file__).resolve().parent.parent.parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-ALLOWED_EXTENSIONS = {".pdf", ".txt", ".md", ".csv", ".json", ".docx"}
+ALLOWED_EXTENSIONS = {".pdf", ".txt", ".md", ".csv", ".json", ".docx", ".pptx"}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
 
 
