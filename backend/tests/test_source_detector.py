@@ -30,3 +30,26 @@ def test_detect_invalid_source():
 
     with pytest.raises(ValueError, match="Invalid source"):
         SourceDetector.detect("   ")
+
+
+def test_detect_malformed_url():
+    """Malformed URLs should raise ValueError."""
+    with pytest.raises(ValueError, match="Invalid URL"):
+        SourceDetector.detect("https://")
+
+    with pytest.raises(ValueError, match="Invalid URL"):
+        SourceDetector.detect("http://")
+
+
+def test_detect_youtube_lookalike_domain():
+    """YouTube lookalike domains should be detected as WEBSITE, not YOUTUBE."""
+    assert SourceDetector.detect("https://fake-youtube.com.evil.com") == SourceType.WEBSITE
+    assert SourceDetector.detect("https://notyoutube.com") == SourceType.WEBSITE
+    assert SourceDetector.detect("https://youtube.com.phishing.com") == SourceType.WEBSITE
+
+
+def test_detect_file_with_youtube_in_name():
+    """Local files with 'youtube' in name should be detected as FILE."""
+    assert SourceDetector.detect("/path/youtube.com.txt") == SourceType.FILE
+    assert SourceDetector.detect("./downloads/youtube_video.mp4") == SourceType.FILE
+    assert SourceDetector.detect("youtu.be-backup.pdf") == SourceType.FILE

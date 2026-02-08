@@ -1,6 +1,6 @@
 """Source type detection for Knowledge Base inputs."""
 from enum import Enum
-from typing import Optional
+from urllib.parse import urlparse
 
 
 class SourceType(Enum):
@@ -31,12 +31,16 @@ class SourceDetector:
 
         source = source.strip()
 
-        # Check for YouTube URLs
-        if "youtube.com" in source or "youtu.be" in source:
-            return SourceType.YOUTUBE
+        # Check for HTTP/HTTPS URLs first
+        if source.startswith(("http://", "https://")):
+            parsed = urlparse(source)
+            if not parsed.netloc:
+                raise ValueError(f"Invalid URL: missing domain in '{source}'")
 
-        # Check for HTTP/HTTPS URLs (website)
-        if source.startswith("http://") or source.startswith("https://"):
+            # Check if it's a YouTube URL by domain
+            if parsed.netloc in ("youtube.com", "www.youtube.com", "youtu.be"):
+                return SourceType.YOUTUBE
+
             return SourceType.WEBSITE
 
         # Default to file path
