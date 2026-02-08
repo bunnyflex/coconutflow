@@ -241,10 +241,22 @@ class ExecutionEngine:
         # Load documents asynchronously if sources are provided
         sources = compiled.get("sources", [])
         if sources:
-            logger.info(f"Loading {len(sources)} documents into knowledge base...")
-            for source_path in sources:
-                await knowledge.add_content_async(path=source_path)
-            logger.info("Documents loaded successfully")
+            from app.services.source_detector import SourceDetector, SourceType
+
+            logger.info(f"Loading {len(sources)} sources into knowledge base...")
+            for source in sources:
+                source_type = SourceDetector.detect(source)
+
+                if source_type == SourceType.FILE:
+                    await knowledge.add_content_async(path=source)
+                elif source_type == SourceType.WEBSITE:
+                    await knowledge.add_content_async(url=source)
+                elif source_type == SourceType.YOUTUBE:
+                    await knowledge.add_content_async(url=source)
+
+                logger.info(f"Loaded {source_type.value}: {source}")
+
+            logger.info("All sources loaded successfully")
 
         from agno.agent import Agent
         from agno.models.openai import OpenAIChat
