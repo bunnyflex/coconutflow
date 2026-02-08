@@ -13,8 +13,35 @@ export default function KnowledgeBaseConfigForm({ config, onChange }: Props) {
     onChange({ ...cfg, ...partial });
   };
 
+  const handleSourcesChange = (value: string) => {
+    // Split by newlines and filter empty lines
+    const sources = value
+      .split('\n')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    update({ sources });
+  };
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Sources Input */}
+      <div>
+        <label className="mb-1 block text-xs font-medium text-gray-400">
+          Sources (one per line)
+        </label>
+        <textarea
+          value={cfg.sources?.join('\n') || ''}
+          onChange={(e) => handleSourcesChange(e.target.value)}
+          placeholder="Enter file paths, website URLs, or YouTube links&#10;Examples:&#10;/uploads/document.pdf&#10;https://docs.python.org&#10;https://youtube.com/watch?v=..."
+          className="w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 outline-none focus:border-indigo-500 font-mono"
+          rows={5}
+        />
+        <p className="mt-1 text-xs text-gray-500">
+          📄 Files • 🌐 Websites • 🎥 YouTube — {cfg.sources?.length || 0} source(s)
+        </p>
+      </div>
+
       <div>
         <label className="mb-1 block text-xs font-medium text-gray-400">Upload Documents</label>
         <div className="rounded-lg border-2 border-dashed border-gray-700 p-4 text-center">
@@ -60,6 +87,23 @@ export default function KnowledgeBaseConfigForm({ config, onChange }: Props) {
           onChange={(e) => update({ chunk_size: parseInt(e.target.value) })}
           className="w-full accent-indigo-500"
         />
+        <p className="mt-1 text-xs text-gray-500">Characters per chunk</p>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-xs font-medium text-gray-400">
+          Chunk Overlap: {cfg.chunk_overlap || 200}
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="500"
+          step="50"
+          value={cfg.chunk_overlap || 200}
+          onChange={(e) => update({ chunk_overlap: parseInt(e.target.value) })}
+          className="w-full accent-indigo-500"
+        />
+        <p className="mt-1 text-xs text-gray-500">Overlap between chunks (preserves context)</p>
       </div>
 
       <div>

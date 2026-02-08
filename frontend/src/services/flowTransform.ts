@@ -69,10 +69,11 @@ function transformNodeConfig(nodeType: string, config: NodeConfig): Record<strin
       const cfg = config as KnowledgeBaseNodeConfig;
       return {
         knowledge_base: {
-          kb_type: 'pdf',
+          kb_type: 'document',
           vector_db: 'pgvector',
-          sources: cfg.files.map((f) => f.url),
+          sources: cfg.sources || [],
           chunk_size: cfg.chunk_size,
+          chunk_overlap: cfg.chunk_overlap || 200,
         },
       };
     }

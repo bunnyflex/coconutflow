@@ -51,7 +51,9 @@ export interface WebSearchNodeConfig {
 
 export interface KnowledgeBaseNodeConfig {
   files: UploadedFile[];
+  sources: string[];  // File paths, URLs, YouTube links
   chunk_size: number;
+  chunk_overlap: number;
   top_k: number;
   search_type: 'hybrid' | 'similarity' | 'keyword';
 }
@@ -100,7 +102,9 @@ export const DEFAULT_CONFIGS: Record<NodeType, NodeConfig> = {
   } as WebSearchNodeConfig,
   knowledge_base: {
     files: [],
+    sources: [],
     chunk_size: 1000,
+    chunk_overlap: 200,
     top_k: 5,
     search_type: 'hybrid',
   } as KnowledgeBaseNodeConfig,
