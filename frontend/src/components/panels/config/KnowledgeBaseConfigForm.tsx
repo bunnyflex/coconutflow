@@ -12,6 +12,7 @@ export default function KnowledgeBaseConfigForm({ config, onChange }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlInput, setUrlInput] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const update = (partial: Partial<KnowledgeBaseNodeConfig>) => {
     onChange({ ...cfg, ...partial });
@@ -42,37 +43,42 @@ export default function KnowledgeBaseConfigForm({ config, onChange }: Props) {
     const files = e.target.files;
     if (!files) return;
 
-    for (const file of Array.from(files)) {
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
 
-        const response = await fetch('http://localhost:8000/api/upload/', {
-          method: 'POST',
-          body: formData,
-        });
+          const response = await fetch('http://localhost:8000/api/upload/', {
+            method: 'POST',
+            body: formData,
+          });
 
-        if (!response.ok) {
-          const error = await response.json();
-          console.error('Upload failed:', error.detail);
-          alert(`Upload failed: ${error.detail}`);
-          continue;
+          if (!response.ok) {
+            const error = await response.json();
+            console.error('Upload failed:', error.detail);
+            alert(`Upload failed: ${error.detail}`);
+            continue;
+          }
+
+          const result = await response.json();
+          addSource(result.path);
+
+          if (result.warnings && result.warnings.length > 0) {
+            console.warn('Upload warnings:', result.warnings);
+          }
+        } catch (err) {
+          console.error('Upload error:', err);
+          alert(`Upload error: ${err instanceof Error ? err.message : 'Unknown error'}`);
         }
-
-        const result = await response.json();
-        addSource(result.path);
-
-        if (result.warnings && result.warnings.length > 0) {
-          console.warn('Upload warnings:', result.warnings);
-        }
-      } catch (err) {
-        console.error('Upload error:', err);
-        alert(`Upload error: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
-    }
 
-    setShowMenu(false);
-    e.target.value = '';
+      setShowMenu(false);
+      e.target.value = '';
+    } finally {
+      setUploading(false);
+    }
   };
 
   const getSourceIcon = (source: string) => {
@@ -128,12 +134,12 @@ export default function KnowledgeBaseConfigForm({ config, onChange }: Props) {
             />
             <label
               htmlFor="kb-file-upload"
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 cursor-pointer transition-colors"
+              className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-700 cursor-pointer transition-colors ${uploading ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
             >
               <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
-              <span className="text-sm text-gray-300">Upload from device</span>
+              <span className="text-sm text-gray-300">{uploading ? 'Uploading...' : 'Upload from device'}</span>
             </label>
 
             <button
