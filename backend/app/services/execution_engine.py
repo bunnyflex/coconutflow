@@ -244,19 +244,28 @@ class ExecutionEngine:
             from app.services.source_detector import SourceDetector, SourceType
 
             logger.info(f"Loading {len(sources)} sources into knowledge base...")
+            loaded_count = 0
             for source in sources:
-                source_type = SourceDetector.detect(source)
+                try:
+                    source_type = SourceDetector.detect(source)
 
-                if source_type == SourceType.FILE:
-                    await knowledge.add_content_async(path=source)
-                elif source_type == SourceType.WEBSITE:
-                    await knowledge.add_content_async(url=source)
-                elif source_type == SourceType.YOUTUBE:
-                    await knowledge.add_content_async(url=source)
+                    if source_type == SourceType.FILE:
+                        await knowledge.add_content_async(path=source)
+                    elif source_type == SourceType.WEBSITE:
+                        await knowledge.add_content_async(url=source)
+                    elif source_type == SourceType.YOUTUBE:
+                        await knowledge.add_content_async(url=source)
 
-                logger.info(f"Loaded {source_type.value}: {source}")
+                    logger.info(f"Loaded {source_type.value}: {source}")
+                    loaded_count += 1
+                except Exception as e:
+                    logger.warning(f"Failed to load source '{source}': {e}")
+                    # Continue with remaining sources
 
-            logger.info("All sources loaded successfully")
+            if loaded_count > 0:
+                logger.info(f"Successfully loaded {loaded_count}/{len(sources)} sources")
+            else:
+                logger.warning("No sources loaded successfully")
 
         from agno.agent import Agent
         from agno.models.openai import OpenAIChat
