@@ -38,17 +38,41 @@ export default function KnowledgeBaseConfigForm({ config, onChange }: Props) {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    Array.from(files).forEach((file) => {
-      // For now, add the file name as a placeholder
-      // In production, you'd upload to /api/upload and get the path
-      addSource(`/uploads/${file.name}`);
-    });
+    for (const file of Array.from(files)) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('http://localhost:8000/api/upload/', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error('Upload failed:', error.detail);
+          alert(`Upload failed: ${error.detail}`);
+          continue;
+        }
+
+        const result = await response.json();
+        addSource(result.path);
+
+        if (result.warnings && result.warnings.length > 0) {
+          console.warn('Upload warnings:', result.warnings);
+        }
+      } catch (err) {
+        console.error('Upload error:', err);
+        alert(`Upload error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      }
+    }
 
     setShowMenu(false);
+    e.target.value = '';
   };
 
   const getSourceIcon = (source: string) => {
