@@ -53,3 +53,22 @@ def test_detect_file_with_youtube_in_name():
     assert SourceDetector.detect("/path/youtube.com.txt") == SourceType.FILE
     assert SourceDetector.detect("./downloads/youtube_video.mp4") == SourceType.FILE
     assert SourceDetector.detect("youtu.be-backup.pdf") == SourceType.FILE
+
+
+def test_detect_youtube_subdomains():
+    """YouTube subdomains should be detected as YOUTUBE."""
+    assert SourceDetector.detect("https://m.youtube.com/watch?v=abc") == SourceType.YOUTUBE
+    assert SourceDetector.detect("https://music.youtube.com") == SourceType.YOUTUBE
+    assert SourceDetector.detect("https://gaming.youtube.com") == SourceType.YOUTUBE
+
+
+def test_detect_case_insensitive_urls():
+    """URLs should be case-insensitive."""
+    assert SourceDetector.detect("HTTPS://YOUTUBE.COM") == SourceType.YOUTUBE
+    assert SourceDetector.detect("HTTP://EXAMPLE.COM") == SourceType.WEBSITE
+
+
+def test_detect_urls_with_ports():
+    """URLs with ports should be detected correctly."""
+    assert SourceDetector.detect("https://youtube.com:443/watch") == SourceType.YOUTUBE
+    assert SourceDetector.detect("http://example.com:8080") == SourceType.WEBSITE

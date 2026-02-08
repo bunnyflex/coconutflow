@@ -31,14 +31,17 @@ class SourceDetector:
 
         source = source.strip()
 
-        # Check for HTTP/HTTPS URLs first
-        if source.startswith(("http://", "https://")):
+        # Check for HTTP/HTTPS URLs first (case-insensitive)
+        if source.lower().startswith(("http://", "https://")):
             parsed = urlparse(source)
             if not parsed.netloc:
                 raise ValueError(f"Invalid URL: missing domain in '{source}'")
 
+            # Extract domain without port
+            domain = parsed.netloc.split(':')[0].lower()
+
             # Check if it's a YouTube URL by domain
-            if parsed.netloc in ("youtube.com", "www.youtube.com", "youtu.be"):
+            if domain in ("youtube.com", "www.youtube.com", "youtu.be") or domain.endswith(".youtube.com"):
                 return SourceType.YOUTUBE
 
             return SourceType.WEBSITE
