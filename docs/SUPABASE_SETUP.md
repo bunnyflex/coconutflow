@@ -102,6 +102,53 @@ The backend will automatically:
    - Enter a question related to your documents
    - KB retrieves relevant chunks and generates answer
 
+## File Upload Validation
+
+CoconutFlow validates uploaded files to ensure quality RAG documents:
+
+### ✅ Accepted Files
+- **Text-based formats**: PDF, TXT, MD, CSV, JSON, DOCX
+- **Must be readable text** (not binary or corrupt)
+- **Non-empty** files only
+- **Under 50MB** total size
+
+### ⚠️ Warnings
+- Files **over 10MB** will trigger a warning (higher embedding costs)
+- Large files are still accepted but flagged
+
+### ❌ Rejected Files
+- **Binary files** disguised as text (e.g., executables renamed to .txt)
+- **Empty files** (0 bytes)
+- **Corrupt files** that can't be decoded as text
+- **Unsupported formats** (e.g., .exe, .zip, .mp3)
+
+### Example Upload Response
+
+**Success with warning:**
+```json
+{
+  "file_id": "abc123",
+  "filename": "large-doc.pdf",
+  "size": 11534336,
+  "extension": ".pdf",
+  "file_type": "text",
+  "warnings": ["Large file (11.0MB) - embedding cost may be high"]
+}
+```
+
+**Rejected (invalid):**
+```json
+{
+  "detail": "Invalid file: File is not readable text"
+}
+```
+
+### Best Practices
+- **PDF**: Best for formatted documents, research papers
+- **TXT/MD**: Great for plain text, notes, transcripts
+- **Keep under 10MB**: Faster processing, lower costs
+- **Quality over quantity**: Upload relevant documents only
+
 ## Without Supabase (Graceful Degradation)
 
 If `DATABASE_URL` is not set, Knowledge Base nodes will:
