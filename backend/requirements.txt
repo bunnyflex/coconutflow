@@ -9,3 +9,8 @@ pytest
 pytest-asyncio
 sqlalchemy
 psycopg2-binary
+
+# Knowledge Base multi-source support
+beautifulsoup4>=4.12.0  # Website content extraction
+requests>=2.31.0         # HTTP requests for website reader
+youtube-transcript-api>=0.6.0  # YouTube video transcript extraction
