@@ -149,6 +149,58 @@ CoconutFlow validates uploaded files to ensure quality RAG documents:
 - **Keep under 10MB**: Faster processing, lower costs
 - **Quality over quantity**: Upload relevant documents only
 
+## Multi-Source Support
+
+CoconutFlow Knowledge Base supports mixing different source types in a single node:
+
+### Supported Source Types
+
+**Files (upload to backend):**
+- `.pdf` - Research papers, documents
+- `.txt` - Plain text files
+- `.md` - Markdown documentation
+- `.csv` - Data tables
+- `.json` - Structured data
+- `.docx` - Microsoft Word documents
+- `.pptx` - PowerPoint presentations
+
+**URLs (direct loading):**
+- **Websites** - Any HTTP/HTTPS URL (e.g., `https://python.org/about/`)
+  - Uses BeautifulSoup for HTML parsing
+  - Extracts main content, ignores navigation/ads
+
+- **YouTube Videos** - Video URLs (e.g., `https://youtube.com/watch?v=abc123`)
+  - Extracts video transcripts/captions
+  - Requires video to have available captions
+  - Supports youtube.com and youtu.be URLs
+
+### How It Works
+
+The backend automatically detects source type:
+- **File path** (local or uploaded) → Uses file reader (PDF, TXT, PPTX, etc.)
+- **HTTP/HTTPS URL** → Uses website reader (BeautifulSoup)
+- **YouTube URL** → Uses YouTube transcript reader
+
+All sources are:
+1. Converted to text chunks (configurable size)
+2. Embedded using OpenAI
+3. Stored in Supabase pgvector
+4. Searchable via RAG queries
+
+### Example: Mixed Sources
+
+```json
+{
+  "sources": [
+    "/uploads/company-docs.pdf",
+    "https://docs.python.org/3/tutorial/",
+    "https://youtube.com/watch?v=tutorial-video-id"
+  ]
+}
+```
+
+All three sources become searchable in a single Knowledge Base!
+
 ## Without Supabase (Graceful Degradation)
 
 If `DATABASE_URL` is not set, Knowledge Base nodes will:

@@ -129,9 +129,10 @@ Plan files in `docs/plans/` are the continuity mechanism across sessions.
 - [x] Knowledge Base RAG pipeline - COMPLETE
   - [x] Backend infrastructure + Supabase setup (Session Pooler for IPv4 compatibility)
   - [x] File upload with validation (binary rejection, size warnings)
-  - [x] Document processing (generic Knowledge class, auto-detects TXT/PDF/MD)
+  - [x] Document processing (generic Knowledge class, auto-detects TXT/PDF/MD/DOCX/PPTX)
+  - [x] Multi-source support (files + websites + YouTube URLs)
   - [x] Async document loading in execution engine (avoids event loop conflicts)
-  - [x] E2E testing with real documents and pgvector RAG queries
+  - [x] E2E testing with real documents, websites, and YouTube videos
 - [ ] Save/Load flow persistence
 
 ## Key Conventions
