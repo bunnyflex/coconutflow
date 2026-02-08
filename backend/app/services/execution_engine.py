@@ -238,6 +238,14 @@ class ExecutionEngine:
             error = compiled.get("knowledge_error", "Knowledge base not configured")
             return f"[Knowledge Base unavailable: {error}]"
 
+        # Load documents asynchronously if sources are provided
+        sources = compiled.get("sources", [])
+        if sources:
+            logger.info(f"Loading {len(sources)} documents into knowledge base...")
+            for source_path in sources:
+                await knowledge.add_content_async(path=source_path)
+            logger.info("Documents loaded successfully")
+
         from agno.agent import Agent
         from agno.models.openai import OpenAIChat
 

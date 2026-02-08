@@ -126,13 +126,12 @@ Plan files in `docs/plans/` are the continuity mechanism across sessions.
 - [x] Chat panel execution (fallback to any node output)
 - [x] Multi-agent chaining (Agent → Agent) - unit test passes, upstream context flows correctly
 - [ ] Conditional with real LLM evaluation via Chat
-- [~] Knowledge Base RAG pipeline - HALF-FIXED
-  - [x] Backend infrastructure + Supabase setup
-  - [x] File upload with validation
-  - [~] Document processing - ISSUE FOUND
-    - Compiler hardcoded for PDF files only (agno.knowledge.pdf)
-    - Need to add text file support OR install PDF dependencies
-  - [ ] E2E testing with real documents (blocked by document processing)
+- [x] Knowledge Base RAG pipeline - COMPLETE
+  - [x] Backend infrastructure + Supabase setup (Session Pooler for IPv4 compatibility)
+  - [x] File upload with validation (binary rejection, size warnings)
+  - [x] Document processing (generic Knowledge class, auto-detects TXT/PDF/MD)
+  - [x] Async document loading in execution engine (avoids event loop conflicts)
+  - [x] E2E testing with real documents and pgvector RAG queries
 - [ ] Save/Load flow persistence
 
 ## Key Conventions

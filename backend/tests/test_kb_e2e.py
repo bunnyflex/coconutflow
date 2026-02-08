@@ -36,8 +36,9 @@ async def test_kb_rag_e2e_with_real_document():
                 "type": "input",
                 "position": {"x": 0, "y": 0},
                 "config": {
-                    "input": {
-                        "value": "What are the main applications of AI in healthcare?"
+                    "input_output": {
+                        "label": "What are the main applications of AI in healthcare?",
+                        "data_type": "text"
                     }
                 }
             },
@@ -87,7 +88,7 @@ async def test_kb_rag_e2e_with_real_document():
 
     # Verify KB node was compiled with knowledge object
     kb_compiled = execution_graph["compiled_nodes"]["kb-1"]
-    assert "knowledge" in kb_compiled, "KB node should have knowledge object"
+    assert "knowledge" in kb_compiled, f"KB node should have knowledge object. Keys: {kb_compiled.keys()}"
     assert kb_compiled["knowledge"] is not None, "Knowledge should not be None when DATABASE_URL is set"
 
     # Execute the flow

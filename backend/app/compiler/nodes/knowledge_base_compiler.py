@@ -45,8 +45,12 @@ class KnowledgeBaseNodeCompiler(BaseNodeCompiler):
 
     @staticmethod
     def _build_pgvector_knowledge(kb_cfg: Any) -> Any:
-        """Create an Agno Knowledge object backed by PgVector."""
-        from agno.knowledge.pdf import PDFKnowledgeBase, PDFReader
+        """Create an Agno Knowledge object backed by PgVector.
+
+        Creates an empty Knowledge instance. Documents will be loaded
+        async during execution to avoid event loop conflicts.
+        """
+        from agno.knowledge import Knowledge
         from agno.vectordb.pgvector import PgVector
 
         db_url = os.environ.get("DATABASE_URL", "")
@@ -58,11 +62,11 @@ class KnowledgeBaseNodeCompiler(BaseNodeCompiler):
             db_url=db_url,
         )
 
-        # Build the knowledge base from uploaded PDF sources
-        knowledge = PDFKnowledgeBase(
-            path=kb_cfg.sources,
+        # Create empty Knowledge instance with vector DB
+        # Documents will be loaded async in execution engine
+        knowledge = Knowledge(
+            name="kb_embeddings",
             vector_db=vector_db,
-            reader=PDFReader(chunk_size=kb_cfg.chunk_size),
         )
 
         return knowledge
