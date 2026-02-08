@@ -129,7 +129,10 @@ Plan files in `docs/plans/` are the continuity mechanism across sessions.
 - [~] Knowledge Base RAG pipeline - HALF-FIXED
   - [x] Backend infrastructure + Supabase setup
   - [x] File upload with validation
-  - [ ] E2E testing with real documents
+  - [~] Document processing - ISSUE FOUND
+    - Compiler hardcoded for PDF files only (agno.knowledge.pdf)
+    - Need to add text file support OR install PDF dependencies
+  - [ ] E2E testing with real documents (blocked by document processing)
 - [ ] Save/Load flow persistence
 
 ## Key Conventions
