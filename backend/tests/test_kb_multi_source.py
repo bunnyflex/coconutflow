@@ -67,12 +67,32 @@ async def test_knowledge_base_loads_file_source():
             os.remove(test_file)
 
 
-@pytest.mark.skip(reason="YouTube reader requires youtube-transcript-api package")
+@pytest.mark.skipif(
+    not os.environ.get("DATABASE_URL") or not os.environ.get("OPENAI_API_KEY"),
+    reason="Requires DATABASE_URL and OPENAI_API_KEY for integration testing"
+)
 @pytest.mark.asyncio
 async def test_knowledge_base_loads_youtube_source():
-    """Test that Knowledge Base can load YouTube URLs (placeholder)."""
-    # This will be implemented when youtube-transcript-api is added
-    pass
+    """Test that Knowledge Base can load YouTube URLs."""
+    from agno.knowledge import Knowledge
+    from agno.vectordb.pgvector import PgVector
+
+    # Create Knowledge instance
+    vector_db = PgVector(
+        table_name="kb_test_yt",
+        db_url=os.environ["DATABASE_URL"]
+    )
+    knowledge = Knowledge(name="kb_test_yt", vector_db=vector_db)
+
+    # Use a short, well-known YouTube video with captions
+    # "Never Gonna Give You Up" by Rick Astley (has verified captions)
+    youtube_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+    # Load YouTube video transcript
+    await knowledge.add_content_async(url=youtube_url)
+
+    # Verify no exception was raised
+    assert True
 
 
 @pytest.mark.skip(reason="Website reader requires requests/beautifulsoup packages")
