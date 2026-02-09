@@ -8,6 +8,7 @@ from app.compiler.nodes.output_compiler import OutputNodeCompiler
 from app.compiler.nodes.conditional_compiler import ConditionalNodeCompiler
 from app.compiler.nodes.knowledge_base_compiler import KnowledgeBaseNodeCompiler
 from app.compiler.nodes.firecrawl_scrape_compiler import FirecrawlScrapeNodeCompiler
+from app.compiler.nodes.mcp_server_compiler import MCPServerNodeCompiler
 from app.compiler.nodes.huggingface_inference_compiler import HuggingFaceInferenceNodeCompiler
 from app.compiler.nodes.apify_actor_compiler import ApifyActorNodeCompiler
 
@@ -19,6 +20,7 @@ ALL_COMPILERS: list[type[BaseNodeCompiler]] = [
     ConditionalNodeCompiler,
     KnowledgeBaseNodeCompiler,
     FirecrawlScrapeNodeCompiler,
+    MCPServerNodeCompiler,
     HuggingFaceInferenceNodeCompiler,
     ApifyActorNodeCompiler,
 ]
