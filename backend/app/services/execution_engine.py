@@ -188,6 +188,31 @@ class ExecutionEngine:
         if node_type == "knowledge_base":
             return await self._execute_knowledge_base(node_id, compiled, edges, node_outputs)
 
+        # External integrations (return structured data as JSON strings)
+        if node_type == "firecrawl_scrape":
+            upstream = _get_upstream_output(node_id, edges, node_outputs)
+            result = await self._execute_firecrawl_scrape(compiled, {"data": upstream})
+            import json
+            return json.dumps(result)
+
+        if node_type == "apify_actor":
+            upstream = _get_upstream_output(node_id, edges, node_outputs)
+            result = await self._execute_apify_actor(compiled, {"data": upstream})
+            import json
+            return json.dumps(result)
+
+        if node_type == "mcp_server":
+            upstream = _get_upstream_output(node_id, edges, node_outputs)
+            result = await self._execute_mcp_server(compiled, {"data": upstream})
+            import json
+            return json.dumps(result)
+
+        if node_type == "huggingface_inference":
+            upstream = _get_upstream_output(node_id, edges, node_outputs)
+            result = await self._execute_huggingface_inference(compiled, {"data": upstream})
+            import json
+            return json.dumps(result)
+
         return f"[Unhandled node type: {node_type}]"
 
     async def _execute_conditional(
@@ -292,3 +317,67 @@ class ExecutionEngine:
 
         resp = await rag_agent.arun(upstream)
         return resp.content or ""
+
+    async def _execute_firecrawl_scrape(
+        self, compiled_node: dict[str, Any], upstream_output: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Execute Firecrawl Scrape node (stub for now)."""
+        from app.services.output_normalizer import OutputEnvelope
+
+        # TODO: Implement real Firecrawl API call
+        # from firecrawl import FirecrawlApp
+        # app = FirecrawlApp(api_key=resolved_api_key)
+        # result = app.scrape_url(url=compiled_node["url"], ...)
+
+        # Stub return for now
+        return OutputEnvelope.wrap(
+            source="firecrawl_scrape",
+            data={"markdown": "# Stub content", "html": "<h1>Stub</h1>"},
+            metadata={"url": compiled_node["url"]},
+            status="success"
+        )
+
+    async def _execute_apify_actor(
+        self, compiled_node: dict[str, Any], upstream_output: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Execute Apify Actor node (stub for now)."""
+        from app.services.output_normalizer import OutputEnvelope
+
+        # TODO: Implement real Apify API call with polling
+
+        return OutputEnvelope.wrap(
+            source="apify_actor",
+            data={"items": [], "total_count": 0},
+            metadata={"actor_id": compiled_node["actor_id"]},
+            status="success"
+        )
+
+    async def _execute_mcp_server(
+        self, compiled_node: dict[str, Any], upstream_output: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Execute MCP Server node (stub for now)."""
+        from app.services.output_normalizer import OutputEnvelope
+
+        # TODO: Implement MCP client connection and agent execution
+
+        return OutputEnvelope.wrap(
+            source="mcp_server",
+            data={"response": "MCP stub response"},
+            metadata={"server_name": compiled_node["server_name"]},
+            status="success"
+        )
+
+    async def _execute_huggingface_inference(
+        self, compiled_node: dict[str, Any], upstream_output: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Execute Hugging Face Inference node (stub for now)."""
+        from app.services.output_normalizer import OutputEnvelope
+
+        # TODO: Implement real HF Inference API call
+
+        return OutputEnvelope.wrap(
+            source="huggingface_inference",
+            data={"output": "HF stub output"},
+            metadata={"model_id": compiled_node["model_id"], "task": compiled_node["task"]},
+            status="success"
+        )
