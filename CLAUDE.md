@@ -21,6 +21,11 @@ npm run lint         # ESLint on TypeScript files
 ```bash
 pip install -r requirements.txt                    # Install dependencies
 cp .env.example .env                               # Set up environment (then fill in API keys)
+
+# Database setup (Supabase)
+# Run migrations: backend/migrations/001_create_flows_table.sql in Supabase SQL editor
+# Set SUPABASE_URL and SUPABASE_KEY in .env (use Session Pooler URL for IPv4 compatibility)
+
 uvicorn app.main:app --reload --port 8000          # Dev server at localhost:8000
 ```
 
@@ -68,12 +73,14 @@ The core architecture follows a compiler pattern:
 
 ### Backend Structure
 
-- **`api/flows.py`** — REST endpoints for flow CRUD (`/api/flows`)
+- **`api/flows.py`** — REST endpoints for flow CRUD (`/api/flows`) with Supabase persistence
 - **`api/websocket.py`** — WebSocket endpoint for flow execution (`/ws/execution`)
 - **`api/upload.py`** — File upload for knowledge base documents
 - **`models/flow.py`** — Pydantic models defining the flow JSON schema (shared contract with frontend TypeScript types in `frontend/src/types/flow.ts`)
 - **`compiler/`** — Flow compilation with plugin-based node compilers
 - **`services/execution_engine.py`** — Async execution engine with streaming events
+- **`services/supabase_client.py`** — Supabase client singleton for database operations
+- **`migrations/`** — SQL migrations for Supabase schema (run manually in Supabase SQL editor)
 
 ### Execution Events (WebSocket protocol)
 
@@ -133,13 +140,19 @@ Plan files in `docs/plans/` are the continuity mechanism across sessions.
   - [x] Multi-source support (files + websites + YouTube URLs)
   - [x] Async document loading in execution engine (avoids event loop conflicts)
   - [x] E2E testing with real documents, websites, and YouTube videos
-- [ ] Save/Load flow persistence
+- [x] Save/Load flow persistence - COMPLETE
+  - [x] Supabase flows table with JSONB storage
+  - [x] REST API endpoints (GET/POST/PUT/DELETE /api/flows)
+  - [x] Frontend FlowManager modal with save/open dialogs
+  - [x] Auto-save on flow changes
 
 ## Key Conventions
 
 - **Type parity**: TypeScript types in `frontend/src/types/flow.ts` mirror Pydantic models in `backend/app/models/flow.py`. Keep them in sync.
 - **Adding a node type**: Create a frontend component in `components/nodes/`, a config form in `components/panels/config/`, a backend compiler extending `BaseNodeCompiler` in `compiler/nodes/`, and register it in `compiler/nodes/__init__.py`.
 - **LLM providers**: OpenAI, Anthropic, Google, Groq, Ollama — configured via environment variables and selectable per-agent node.
-- **Flow storage is in-memory** on the backend (dict-based). Supabase persistence is planned but not yet wired.
+- **Flow persistence**: Flows are stored in Supabase `flows` table with JSONB columns. REST API at `/api/flows` handles CRUD. Frontend auto-saves on changes.
+- **Supabase setup**: Use Session Pooler URL (`*.pooler.supabase.com`) for IPv4 compatibility. Direct connection (`db.*.supabase.com`) requires IPv6.
+- **Knowledge Base**: Documents embedded to Supabase pgvector via Agno's `Knowledge` class. Supports files (TXT/PDF/MD/DOCX/PPTX), websites (http/https), and YouTube URLs. Loading is async in execution engine to avoid event loop conflicts.
 - **CORS is wide open** in `backend/app/main.py` — needs lockdown for production.
 - **Git commits**: Do NOT include "Co-Authored-By: Claude" in commit messages. All commits should be attributed solely to the human developer.
