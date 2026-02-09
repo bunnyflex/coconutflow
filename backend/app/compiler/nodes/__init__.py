@@ -7,6 +7,8 @@ from app.compiler.nodes.web_search_compiler import WebSearchNodeCompiler
 from app.compiler.nodes.output_compiler import OutputNodeCompiler
 from app.compiler.nodes.conditional_compiler import ConditionalNodeCompiler
 from app.compiler.nodes.knowledge_base_compiler import KnowledgeBaseNodeCompiler
+from app.compiler.nodes.firecrawl_scrape_compiler import FirecrawlScrapeNodeCompiler
+from app.compiler.nodes.huggingface_inference_compiler import HuggingFaceInferenceNodeCompiler
 
 ALL_COMPILERS: list[type[BaseNodeCompiler]] = [
     InputNodeCompiler,
@@ -15,6 +17,8 @@ ALL_COMPILERS: list[type[BaseNodeCompiler]] = [
     OutputNodeCompiler,
     ConditionalNodeCompiler,
     KnowledgeBaseNodeCompiler,
+    FirecrawlScrapeNodeCompiler,
+    HuggingFaceInferenceNodeCompiler,
 ]
 
 
