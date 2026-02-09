@@ -37,7 +37,7 @@ async function dragNodeToCanvas(
 
       // Build a DataTransfer with the node type
       const dt = new DataTransfer();
-      dt.setData('application/agnoflow-node', nodeType);
+      dt.setData('application/coconutflow-node', nodeType);
 
       // Dispatch dragover first (required for drop to work)
       const dragOverEvent = new DragEvent('dragover', {
