@@ -38,3 +38,6 @@ Thumbs.db
 # E2E test artifacts
 e2e/results/
 e2e/report/
+
+# Git worktrees
+.worktrees/
