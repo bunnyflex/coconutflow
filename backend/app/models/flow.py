@@ -29,6 +29,11 @@ class NodeType(str, Enum):
     LOOP = "loop"
     WEBHOOK = "webhook"
     SCHEDULE = "schedule"
+    # External integrations
+    FIRECRAWL_SCRAPE = "firecrawl_scrape"
+    APIFY_ACTOR = "apify_actor"
+    MCP_SERVER = "mcp_server"
+    HUGGINGFACE_INFERENCE = "huggingface_inference"
 
 
 class TeamMode(str, Enum):
@@ -138,6 +143,41 @@ class InputOutputConfig(BaseModel):
     data_type: str = "text"  # text, json, file
 
 
+class FirecrawlScrapeConfig(BaseModel):
+    """Configuration for Firecrawl Scrape nodes."""
+    url: str = ""
+    formats: list[str] = Field(default_factory=lambda: ["markdown"])
+    include_metadata: bool = True
+    credential_id: Optional[str] = None
+
+
+class ApifyActorConfig(BaseModel):
+    """Configuration for Apify Actor nodes."""
+    actor_id: str = ""
+    input: dict[str, Any] = Field(default_factory=dict)
+    max_items: int = 100
+    timeout_secs: int = 300
+    credential_id: Optional[str] = None
+
+
+class MCPServerConfig(BaseModel):
+    """Configuration for MCP Server nodes."""
+    server_name: str = ""
+    server_url: str = ""
+    server_type: str = "stdio"  # "stdio", "sse", "http"
+    instructions: Optional[str] = None
+    credential_id: Optional[str] = None
+
+
+class HuggingFaceInferenceConfig(BaseModel):
+    """Configuration for Hugging Face Inference nodes."""
+    model_id: str = ""
+    task: str = "text-generation"  # text-generation, embeddings, classification, etc.
+    parameters: dict[str, Any] = Field(default_factory=dict)
+    input_key: str = "{{upstream.data}}"
+    credential_id: Optional[str] = None
+
+
 # ---------------------------------------------------------------------------
 # Unified NodeConfig
 # ---------------------------------------------------------------------------
@@ -157,6 +197,12 @@ class NodeConfig(BaseModel):
     webhook: Optional[WebhookConfig] = None
     schedule: Optional[ScheduleConfig] = None
     input_output: Optional[InputOutputConfig] = None
+
+    # NEW: External integration configs
+    firecrawl_scrape: Optional[FirecrawlScrapeConfig] = None
+    apify_actor: Optional[ApifyActorConfig] = None
+    mcp_server: Optional[MCPServerConfig] = None
+    huggingface_inference: Optional[HuggingFaceInferenceConfig] = None
 
 
 # ---------------------------------------------------------------------------

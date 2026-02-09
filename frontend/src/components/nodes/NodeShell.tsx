@@ -11,6 +11,10 @@ const NODE_ACCENT: Record<NodeType, { bg: string; text: string; gradient: string
   conditional:    { bg: 'bg-amber-500/15',  text: 'text-amber-400',  gradient: '#f59e0b' },
   web_search:     { bg: 'bg-cyan-500/15',   text: 'text-cyan-400',   gradient: '#06b6d4' },
   knowledge_base: { bg: 'bg-purple-500/15', text: 'text-purple-400', gradient: '#a855f7' },
+  firecrawl_scrape: { bg: 'bg-orange-500/15', text: 'text-orange-400', gradient: '#f97316' },
+  apify_actor:    { bg: 'bg-rose-500/15',   text: 'text-rose-400',   gradient: '#f43f5e' },
+  mcp_server:     { bg: 'bg-teal-500/15',   text: 'text-teal-400',   gradient: '#14b8a6' },
+  huggingface_inference: { bg: 'bg-violet-500/15', text: 'text-violet-400', gradient: '#8b5cf6' },
 };
 
 const STATUS_BORDER: Record<NodeStatus, string> = {

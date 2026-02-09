@@ -133,6 +133,10 @@ function getDefaultConfig(type: NodeType): NodeConfig {
     knowledge_base: { files: [], chunk_size: 1000, top_k: 5, search_type: 'hybrid' },
     conditional: { condition: '', true_label: 'True', false_label: 'False' },
     output: { display_format: 'markdown', copy_to_clipboard: true },
+    firecrawl_scrape: { url: '', formats: ['markdown'], include_metadata: true, credential_id: null },
+    apify_actor: { actor_id: '', input: {}, max_items: 100, timeout_secs: 300, credential_id: null },
+    mcp_server: { server_name: '', server_url: '', server_type: 'stdio', instructions: null, credential_id: null },
+    huggingface_inference: { model_id: '', task: 'text-generation', parameters: {}, input_key: '{{upstream.data}}', credential_id: null },
   } as Record<NodeType, NodeConfig>;
 
   return defaults[type];
@@ -146,6 +150,10 @@ function getNodeLabel(type: NodeType): string {
     knowledge_base: 'Knowledge Base',
     conditional: 'Conditional',
     output: 'Output',
+    firecrawl_scrape: 'Firecrawl Scrape',
+    apify_actor: 'Apify Actor',
+    mcp_server: 'MCP Server',
+    huggingface_inference: 'Hugging Face',
   };
   return labels[type];
 }

@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.flows import router as flows_router
 from app.api.upload import router as upload_router
 from app.api.websocket import router as websocket_router
+from app.api.credentials import router as credentials_router
 
 # ---------------------------------------------------------------------------
 # Application
@@ -46,6 +47,7 @@ app.add_middleware(
 app.include_router(flows_router)
 app.include_router(upload_router)
 app.include_router(websocket_router)
+app.include_router(credentials_router)
 
 # ---------------------------------------------------------------------------
 # Health Check
