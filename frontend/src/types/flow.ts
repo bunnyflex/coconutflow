@@ -13,7 +13,11 @@ export type NodeType =
   | 'web_search'
   | 'knowledge_base'
   | 'conditional'
-  | 'output';
+  | 'output'
+  | 'firecrawl_scrape'
+  | 'apify_actor'
+  | 'mcp_server'
+  | 'huggingface_inference';
 
 export type NodeStatus = 'idle' | 'pending' | 'running' | 'completed' | 'error';
 
@@ -69,13 +73,48 @@ export interface OutputNodeConfig {
   copy_to_clipboard: boolean;
 }
 
+export interface FirecrawlScrapeConfig {
+  url: string;
+  formats: string[];
+  include_metadata: boolean;
+  credential_id: string | null;
+}
+
+export interface ApifyActorConfig {
+  actor_id: string;
+  input: Record<string, any>;
+  max_items: number;
+  timeout_secs: number;
+  credential_id: string | null;
+}
+
+export interface MCPServerConfig {
+  server_name: string;
+  server_url: string;
+  server_type: 'stdio' | 'sse' | 'http';
+  instructions: string | null;
+  credential_id: string | null;
+}
+
+export interface HuggingFaceInferenceConfig {
+  model_id: string;
+  task: string;
+  parameters: Record<string, any>;
+  input_key: string;
+  credential_id: string | null;
+}
+
 export type NodeConfig =
   | InputNodeConfig
   | LLMAgentNodeConfig
   | WebSearchNodeConfig
   | KnowledgeBaseNodeConfig
   | ConditionalNodeConfig
-  | OutputNodeConfig;
+  | OutputNodeConfig
+  | FirecrawlScrapeConfig
+  | ApifyActorConfig
+  | MCPServerConfig
+  | HuggingFaceInferenceConfig;
 
 // ---------------------------------------------------------------------------
 // Default configs for each node type
@@ -117,6 +156,33 @@ export const DEFAULT_CONFIGS: Record<NodeType, NodeConfig> = {
     display_format: 'markdown',
     copy_to_clipboard: true,
   } as OutputNodeConfig,
+  firecrawl_scrape: {
+    url: '',
+    formats: ['markdown'],
+    include_metadata: true,
+    credential_id: null,
+  } as FirecrawlScrapeConfig,
+  apify_actor: {
+    actor_id: '',
+    input: {},
+    max_items: 100,
+    timeout_secs: 300,
+    credential_id: null,
+  } as ApifyActorConfig,
+  mcp_server: {
+    server_name: '',
+    server_url: '',
+    server_type: 'stdio',
+    instructions: null,
+    credential_id: null,
+  } as MCPServerConfig,
+  huggingface_inference: {
+    model_id: '',
+    task: 'text-generation',
+    parameters: {},
+    input_key: '{{upstream.data}}',
+    credential_id: null,
+  } as HuggingFaceInferenceConfig,
 };
 
 // ---------------------------------------------------------------------------
@@ -227,7 +293,7 @@ export interface NodeTypeInfo {
   category: 'input_output' | 'processing' | 'tools';
 }
 
-import { ArrowDownToLine, ArrowUpFromLine, Bot, GitBranch, Globe, BookOpen } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpFromLine, Bot, GitBranch, Globe, BookOpen, Flame, PlayCircle, Blocks, Brain } from 'lucide-react';
 
 const ic = (C: React.FC<{ className?: string }>) => React.createElement(C, { className: 'h-5 w-5 text-gray-400' });
 
@@ -272,6 +338,34 @@ export const NODE_TYPE_CATALOG: NodeTypeInfo[] = [
     label: 'Knowledge Base',
     description: 'Upload documents for RAG',
     icon: ic(BookOpen),
+    category: 'tools',
+  },
+  {
+    type: 'firecrawl_scrape',
+    label: 'Firecrawl Scrape',
+    description: 'Scrape websites to Markdown',
+    icon: ic(Flame),
+    category: 'tools',
+  },
+  {
+    type: 'apify_actor',
+    label: 'Apify Actor',
+    description: 'Run pre-built scrapers',
+    icon: ic(PlayCircle),
+    category: 'tools',
+  },
+  {
+    type: 'mcp_server',
+    label: 'MCP Server',
+    description: 'Connect to MCP servers',
+    icon: ic(Blocks),
+    category: 'tools',
+  },
+  {
+    type: 'huggingface_inference',
+    label: 'Hugging Face',
+    description: 'Run HF model inference',
+    icon: ic(Brain),
     category: 'tools',
   },
 ];

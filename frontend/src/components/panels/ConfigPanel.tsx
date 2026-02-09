@@ -7,6 +7,10 @@ import WebSearchConfigForm from './config/WebSearchConfigForm';
 import KnowledgeBaseConfigForm from './config/KnowledgeBaseConfigForm';
 import ConditionalConfigForm from './config/ConditionalConfigForm';
 import OutputConfigForm from './config/OutputConfigForm';
+import FirecrawlScrapeConfigForm from './config/FirecrawlScrapeConfig';
+import ApifyActorConfigForm from './config/ApifyActorConfig';
+import MCPServerConfigForm from './config/MCPServerConfig';
+import HuggingFaceInferenceConfigForm from './config/HuggingFaceInferenceConfig';
 
 const FORM_MAP: Record<NodeType, React.FC<{ nodeId: string; config: NodeConfig; onChange: (c: NodeConfig) => void }>> = {
   input: InputConfigForm,
@@ -15,6 +19,10 @@ const FORM_MAP: Record<NodeType, React.FC<{ nodeId: string; config: NodeConfig; 
   knowledge_base: KnowledgeBaseConfigForm,
   conditional: ConditionalConfigForm,
   output: OutputConfigForm,
+  firecrawl_scrape: FirecrawlScrapeConfigForm,
+  apify_actor: ApifyActorConfigForm,
+  mcp_server: MCPServerConfigForm,
+  huggingface_inference: HuggingFaceInferenceConfigForm,
 };
 
 export default function ConfigPanel() {
