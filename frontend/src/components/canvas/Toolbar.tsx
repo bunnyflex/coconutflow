@@ -79,6 +79,7 @@ export default function Toolbar() {
       {/* Run */}
       {isRunning ? (
         <button
+          data-testid="run-button-running"
           disabled
           className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white opacity-80 cursor-not-allowed"
         >
@@ -90,6 +91,7 @@ export default function Toolbar() {
         </button>
       ) : (
         <ShimmerButton
+          data-testid="run-button"
           onClick={handleRun}
           disabled={nodes.length === 0}
           shimmerColor="#a5b4fc"
@@ -109,6 +111,7 @@ export default function Toolbar() {
 
       {/* Save */}
       <button
+        data-testid="save-button"
         onClick={handleSave}
         disabled={nodes.length === 0 || saveStatus === 'saving'}
         className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
@@ -149,6 +152,7 @@ export default function Toolbar() {
 
       {/* Chat toggle */}
       <button
+        data-testid="chat-toggle"
         onClick={toggleChat}
         className={`rounded-lg p-2 transition-colors ${
           isChatOpen
@@ -166,6 +170,7 @@ export default function Toolbar() {
 
       {/* Undo */}
       <button
+        data-testid="undo-button"
         onClick={undo}
         disabled={undoStack.length === 0}
         className="rounded-lg px-3 py-1.5 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
@@ -178,6 +183,7 @@ export default function Toolbar() {
 
       {/* Open */}
       <button
+        data-testid="open-button"
         onClick={() => setShowFlowManager(true)}
         className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
         title="Open saved flow"
@@ -190,6 +196,7 @@ export default function Toolbar() {
 
       {/* Clear */}
       <button
+        data-testid="clear-button"
         onClick={handleClear}
         disabled={nodes.length === 0}
         className="rounded-lg px-3 py-1.5 text-sm text-gray-300 transition-colors hover:bg-gray-800 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"

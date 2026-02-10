@@ -69,11 +69,12 @@ export default function ChatPanel() {
   };
 
   return (
-    <aside className="flex h-full w-96 flex-col border-l border-gray-800 bg-gray-900">
+    <aside data-testid="chat-panel" className="flex h-full w-96 flex-col border-l border-gray-800 bg-gray-900">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-800 px-4 py-3">
         <h2 className="text-sm font-semibold text-white">Chat</h2>
         <button
+          data-testid="clear-chat-button"
           onClick={clearChat}
           className="text-xs text-gray-400 hover:text-white transition-colors"
           title="Clear chat"
@@ -83,7 +84,7 @@ export default function ChatPanel() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+      <div data-testid="chat-messages" className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {messages.length === 0 && (
           <div className="flex h-full items-center justify-center">
             <p className="text-sm text-gray-500 text-center">
@@ -103,7 +104,7 @@ export default function ChatPanel() {
           />
         ))}
         {isRunning && (
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div data-testid="chat-running-indicator" className="flex items-center gap-2 text-sm text-gray-400">
             <span className="animate-pulse">●</span> Running flow...
           </div>
         )}
@@ -114,6 +115,7 @@ export default function ChatPanel() {
       <div className="border-t border-gray-800 p-3">
         <div className="flex items-end gap-2">
           <textarea
+            data-testid="chat-input"
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -123,6 +125,7 @@ export default function ChatPanel() {
             className="flex-1 resize-none rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-indigo-500 focus:outline-none"
           />
           <RippleButton
+            data-testid="chat-send-button"
             onClick={handleSend}
             disabled={!input.trim() || isRunning}
             rippleColor="#a5b4fc"
@@ -146,6 +149,7 @@ function MessageBubble({ message, isLatest = false }: { message: ChatMessage; is
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
+        data-testid={isSystem ? 'chat-error-message' : isUser ? 'chat-user-message' : 'chat-assistant-message'}
         className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
           isUser
             ? 'bg-indigo-600 text-white'

@@ -56,6 +56,7 @@ export default function FlowManager({ isOpen, onClose }: Props) {
 
   return (
     <div
+      data-testid="flow-manager-modal"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       onClick={onClose}
     >
@@ -67,6 +68,7 @@ export default function FlowManager({ isOpen, onClose }: Props) {
         <div className="flex items-center justify-between border-b border-gray-700 px-5 py-4">
           <h2 className="text-lg font-semibold text-white">Saved Flows</h2>
           <button
+            data-testid="flow-manager-close"
             onClick={onClose}
             className="rounded-lg p-1 text-gray-400 hover:bg-gray-800 hover:text-white"
           >
@@ -79,13 +81,13 @@ export default function FlowManager({ isOpen, onClose }: Props) {
         {/* Body */}
         <div className="max-h-[400px] overflow-y-auto p-5">
           {error && (
-            <div className="mb-3 rounded-lg bg-red-900/30 px-3 py-2 text-sm text-red-400">
+            <div data-testid="flow-manager-error" className="mb-3 rounded-lg bg-red-900/30 px-3 py-2 text-sm text-red-400">
               {error}
             </div>
           )}
 
           {loading ? (
-            <div className="flex items-center justify-center py-8 text-gray-400">
+            <div data-testid="flow-manager-loading" className="flex items-center justify-center py-8 text-gray-400">
               <svg className="mr-2 h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
@@ -93,12 +95,13 @@ export default function FlowManager({ isOpen, onClose }: Props) {
               Loading...
             </div>
           ) : flows.length === 0 ? (
-            <p className="py-8 text-center text-sm text-gray-500">No saved flows yet</p>
+            <p data-testid="flow-manager-empty" className="py-8 text-center text-sm text-gray-500">No saved flows yet</p>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div data-testid="flow-list" className="flex flex-col gap-2">
               {flows.map((flow) => (
                 <div
                   key={flow.id}
+                  data-testid={`flow-item-${flow.id}`}
                   className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
                     flow.id === flowId
                       ? 'border-indigo-500 bg-indigo-950/30'
@@ -106,7 +109,7 @@ export default function FlowManager({ isOpen, onClose }: Props) {
                   }`}
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white">{flow.name}</p>
+                    <p data-testid="flow-name" className="truncate text-sm font-medium text-white">{flow.name}</p>
                     {flow.description && (
                       <p className="truncate text-xs text-gray-400">{flow.description}</p>
                     )}
@@ -116,12 +119,14 @@ export default function FlowManager({ isOpen, onClose }: Props) {
                   </div>
                   <div className="ml-3 flex items-center gap-1">
                     <button
+                      data-testid={`flow-load-${flow.id}`}
                       onClick={() => handleLoad(flow.id)}
                       className="rounded-md px-3 py-1 text-xs font-medium text-indigo-400 hover:bg-indigo-900/30"
                     >
                       Load
                     </button>
                     <button
+                      data-testid={`flow-delete-${flow.id}`}
                       onClick={() => handleDelete(flow.id)}
                       className="rounded-md px-3 py-1 text-xs font-medium text-red-400 hover:bg-red-900/30"
                     >
