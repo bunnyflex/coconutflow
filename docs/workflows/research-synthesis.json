@@ -1,0 +1,194 @@
+{
+  "id": "research-synthesis",
+  "name": "Research Synthesis Engine",
+  "description": "Multi-stage research pipeline that searches the web, scrapes content with Firecrawl, generates embeddings with Hugging Face, stores in a knowledge base, and synthesizes findings with citations using an AI agent.",
+  "nodes": [
+    {
+      "id": "node-1",
+      "type": "input",
+      "position": {
+        "x": 100,
+        "y": 250
+      },
+      "config": {
+        "input_output": {
+          "label": "Research Question",
+          "data_type": "text"
+        }
+      },
+      "label": "Research Question"
+    },
+    {
+      "id": "node-2",
+      "type": "tool",
+      "position": {
+        "x": 250,
+        "y": 250
+      },
+      "config": {
+        "tool": {
+          "tool_type": "duckduckgo_search",
+          "parameters": {
+            "query": "{{upstream}}",
+            "max_results": 10
+          }
+        }
+      },
+      "label": "Web Search"
+    },
+    {
+      "id": "node-3",
+      "type": "firecrawl_scrape",
+      "position": {
+        "x": 400,
+        "y": 250
+      },
+      "config": {
+        "firecrawl_scrape": {
+          "url": "{{upstream}}",
+          "formats": ["markdown"],
+          "include_metadata": true,
+          "credential_id": null
+        }
+      },
+      "label": "Firecrawl Scrape"
+    },
+    {
+      "id": "node-4",
+      "type": "huggingface_inference",
+      "position": {
+        "x": 550,
+        "y": 250
+      },
+      "config": {
+        "huggingface_inference": {
+          "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+          "task": "feature-extraction",
+          "parameters": {},
+          "input_key": "{{upstream}}",
+          "credential_id": null
+        }
+      },
+      "label": "Generate Embeddings"
+    },
+    {
+      "id": "node-5",
+      "type": "knowledge_base",
+      "position": {
+        "x": 700,
+        "y": 250
+      },
+      "config": {
+        "knowledge_base": {
+          "kb_type": "url",
+          "vector_db": "pgvector",
+          "sources": ["{{upstream}}"],
+          "chunk_size": 1000,
+          "chunk_overlap": 200
+        }
+      },
+      "label": "Knowledge Base"
+    },
+    {
+      "id": "node-6",
+      "type": "agent",
+      "position": {
+        "x": 850,
+        "y": 250
+      },
+      "config": {
+        "agent": {
+          "name": "Research Synthesizer",
+          "provider": "openai",
+          "model": "gpt-4o",
+          "system_prompt": "You are a research synthesis expert. Analyze research findings and generate comprehensive reports with citations.",
+          "temperature": 0.7,
+          "max_tokens": null,
+          "tools": [],
+          "knowledge_bases": ["node-5"],
+          "instructions": [
+            "Synthesize research findings with citations",
+            "Format output as: ## Summary [synthesis] ## Key Findings [bullet points] ## Sources [1] [2] [3]",
+            "Include evidence-based insights and cross-reference sources",
+            "Maintain academic rigor and cite all claims"
+          ],
+          "show_tool_calls": true,
+          "markdown": true
+        }
+      },
+      "label": "Research Synthesizer"
+    },
+    {
+      "id": "node-7",
+      "type": "output",
+      "position": {
+        "x": 1000,
+        "y": 250
+      },
+      "config": {
+        "input_output": {
+          "label": "Research Report",
+          "data_type": "text"
+        }
+      },
+      "label": "Research Report"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1-2",
+      "source": "node-1",
+      "source_handle": null,
+      "target": "node-2",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-2-3",
+      "source": "node-2",
+      "source_handle": null,
+      "target": "node-3",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-3-4",
+      "source": "node-3",
+      "source_handle": null,
+      "target": "node-4",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-4-5",
+      "source": "node-4",
+      "source_handle": null,
+      "target": "node-5",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-5-6",
+      "source": "node-5",
+      "source_handle": null,
+      "target": "node-6",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-6-7",
+      "source": "node-6",
+      "source_handle": null,
+      "target": "node-7",
+      "target_handle": null,
+      "label": null
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-02-09T00:00:00Z",
+    "updated_at": "2026-02-09T00:00:00Z",
+    "version": "1.0.0",
+    "author": "CoconutFlow Team",
+    "tags": ["research", "web-scraping", "embeddings", "rag", "synthesis", "firecrawl", "huggingface"]
+  }
+}

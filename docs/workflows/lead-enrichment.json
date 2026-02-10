@@ -1,0 +1,180 @@
+{
+  "id": "lead-enrichment",
+  "name": "Lead Enrichment Pipeline",
+  "description": "Enrich sales leads by running parallel scraping operations - Apify extracts LinkedIn company data while Firecrawl scrapes the company website. Both outputs merge into a knowledge base, then an AI agent generates a comprehensive lead profile with talking points.",
+  "nodes": [
+    {
+      "id": "node-1",
+      "type": "input",
+      "position": {
+        "x": 100,
+        "y": 250
+      },
+      "config": {
+        "input_output": {
+          "label": "Company Name",
+          "data_type": "text"
+        }
+      },
+      "label": "Company Input"
+    },
+    {
+      "id": "node-2",
+      "type": "apify_actor",
+      "position": {
+        "x": 250,
+        "y": 150
+      },
+      "config": {
+        "apify_actor": {
+          "actor_id": "apify/linkedin-company-scraper",
+          "input": {
+            "company": "{{upstream}}"
+          },
+          "max_items": 50,
+          "timeout_secs": 300,
+          "credential_id": null
+        }
+      },
+      "label": "LinkedIn Data"
+    },
+    {
+      "id": "node-3",
+      "type": "firecrawl_scrape",
+      "position": {
+        "x": 250,
+        "y": 350
+      },
+      "config": {
+        "firecrawl_scrape": {
+          "url": "{{upstream}}.com",
+          "formats": ["markdown"],
+          "include_metadata": true,
+          "credential_id": null
+        }
+      },
+      "label": "Company Website"
+    },
+    {
+      "id": "node-4",
+      "type": "knowledge_base",
+      "position": {
+        "x": 450,
+        "y": 250
+      },
+      "config": {
+        "knowledge_base": {
+          "kb_type": "url",
+          "vector_db": "pgvector",
+          "sources": ["{{upstream}}"],
+          "chunk_size": 1000,
+          "chunk_overlap": 200
+        }
+      },
+      "label": "Merge Sources"
+    },
+    {
+      "id": "node-5",
+      "type": "agent",
+      "position": {
+        "x": 650,
+        "y": 250
+      },
+      "config": {
+        "agent": {
+          "name": "Lead Enrichment Analyst",
+          "provider": "openai",
+          "model": "gpt-4o",
+          "system_prompt": "You are a sales intelligence analyst specializing in B2B lead enrichment. Generate comprehensive lead profiles with actionable sales insights.",
+          "temperature": 0.7,
+          "max_tokens": null,
+          "tools": [],
+          "knowledge_bases": ["node-4"],
+          "instructions": [
+            "Generate a comprehensive lead enrichment profile using data from LinkedIn and company website",
+            "## Company Overview - Summarize company mission, size, industry, and key leadership",
+            "## Key Products & Services - List main offerings and unique value propositions",
+            "## Recent News & Updates - Highlight recent announcements, funding, partnerships, or product launches",
+            "## Sales Talking Points - Provide 3-5 personalized talking points for initial outreach",
+            "Format output as a structured markdown report optimized for sales teams"
+          ],
+          "show_tool_calls": true,
+          "markdown": true
+        }
+      },
+      "label": "Analyze & Enrich"
+    },
+    {
+      "id": "node-6",
+      "type": "output",
+      "position": {
+        "x": 850,
+        "y": 250
+      },
+      "config": {
+        "input_output": {
+          "label": "Enriched Lead Profile",
+          "data_type": "text"
+        }
+      },
+      "label": "Lead Profile"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "source": "node-1",
+      "source_handle": null,
+      "target": "node-2",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-2",
+      "source": "node-1",
+      "source_handle": null,
+      "target": "node-3",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-3",
+      "source": "node-2",
+      "source_handle": null,
+      "target": "node-4",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-4",
+      "source": "node-3",
+      "source_handle": null,
+      "target": "node-4",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-5",
+      "source": "node-4",
+      "source_handle": null,
+      "target": "node-5",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-6",
+      "source": "node-5",
+      "source_handle": null,
+      "target": "node-6",
+      "target_handle": null,
+      "label": null
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-02-09T00:00:00Z",
+    "updated_at": "2026-02-09T00:00:00Z",
+    "version": "1.0.0",
+    "author": "CoconutFlow Team",
+    "tags": ["lead-enrichment", "parallel-execution", "apify", "firecrawl", "rag", "sales-intelligence"]
+  }
+}

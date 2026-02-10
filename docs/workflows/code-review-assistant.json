@@ -1,0 +1,150 @@
+{
+  "id": "code-review-assistant",
+  "name": "Code Review Assistant",
+  "description": "Automated GitHub PR code reviewer that fetches PR diffs via MCP Server, analyzes code quality with LLM, and conditionally posts review comments or approves PRs based on findings.",
+  "nodes": [
+    {
+      "id": "node-1",
+      "type": "mcp_server",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "config": {
+        "mcp_server": {
+          "server_name": "github",
+          "server_url": "npx @modelcontextprotocol/server-github",
+          "server_type": "stdio",
+          "instructions": "Fetch PR diff for {{upstream}}",
+          "credential_id": null
+        }
+      },
+      "label": "Read GitHub PR"
+    },
+    {
+      "id": "node-2",
+      "type": "agent",
+      "position": {
+        "x": 300,
+        "y": 200
+      },
+      "config": {
+        "agent": {
+          "name": "Code Reviewer",
+          "provider": "openai",
+          "model": "gpt-4o",
+          "system_prompt": "You are an expert code reviewer. Analyze code for bugs, security vulnerabilities, style violations, and performance issues.",
+          "temperature": 0.3,
+          "max_tokens": null,
+          "tools": [],
+          "knowledge_bases": [],
+          "instructions": [
+            "Review the provided PR diff line by line",
+            "Identify bugs, logic errors, and edge cases",
+            "Check for security vulnerabilities (SQL injection, XSS, auth bypass, etc.)",
+            "Flag style violations and code quality issues",
+            "Assess performance implications (N+1 queries, inefficient algorithms, etc.)",
+            "Output valid JSON with structure: {\"issues\": [{\"file\": \"path\", \"line\": 123, \"severity\": \"high|medium|low\", \"message\": \"description\"}], \"severity\": \"high|medium|low\", \"approve\": true|false}",
+            "Set approve to false if any high or medium severity issues are found"
+          ],
+          "show_tool_calls": true,
+          "markdown": false
+        }
+      },
+      "label": "Review Code"
+    },
+    {
+      "id": "node-3",
+      "type": "conditional",
+      "position": {
+        "x": 500,
+        "y": 200
+      },
+      "config": {
+        "conditional": {
+          "condition_expression": "approve is false",
+          "true_label": "Issues Found",
+          "false_label": "Approved"
+        }
+      },
+      "label": "Approval Gate"
+    },
+    {
+      "id": "node-4",
+      "type": "mcp_server",
+      "position": {
+        "x": 700,
+        "y": 150
+      },
+      "config": {
+        "mcp_server": {
+          "server_name": "github",
+          "server_url": "npx @modelcontextprotocol/server-github",
+          "server_type": "stdio",
+          "instructions": "Post review comment with issues from {{upstream}}",
+          "credential_id": null
+        }
+      },
+      "label": "Post Review Comments"
+    },
+    {
+      "id": "node-5",
+      "type": "mcp_server",
+      "position": {
+        "x": 700,
+        "y": 250
+      },
+      "config": {
+        "mcp_server": {
+          "server_name": "github",
+          "server_url": "npx @modelcontextprotocol/server-github",
+          "server_type": "stdio",
+          "instructions": "Approve PR",
+          "credential_id": null
+        }
+      },
+      "label": "Approve PR"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "source": "node-1",
+      "source_handle": null,
+      "target": "node-2",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-2",
+      "source": "node-2",
+      "source_handle": null,
+      "target": "node-3",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-3",
+      "source": "node-3",
+      "source_handle": "true",
+      "target": "node-4",
+      "target_handle": null,
+      "label": "Issues Found"
+    },
+    {
+      "id": "edge-4",
+      "source": "node-3",
+      "source_handle": "false",
+      "target": "node-5",
+      "target_handle": null,
+      "label": "Approved"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-02-09T00:00:00Z",
+    "updated_at": "2026-02-09T00:00:00Z",
+    "version": "1.0.0",
+    "author": "CoconutFlow Team",
+    "tags": ["code-review", "github", "mcp-server", "automation", "conditional"]
+  }
+}

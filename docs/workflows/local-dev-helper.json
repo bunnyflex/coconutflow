@@ -1,0 +1,123 @@
+{
+  "id": "local-dev-helper",
+  "name": "Local Development Helper",
+  "description": "Automated test generation workflow that reads source code files from local filesystem via MCP Server, generates comprehensive unit tests using LLM, and writes test files back to the filesystem.",
+  "nodes": [
+    {
+      "id": "node-1",
+      "type": "mcp_server",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "config": {
+        "mcp_server": {
+          "server_name": "filesystem",
+          "server_url": "npx @modelcontextprotocol/server-filesystem /path/to/code",
+          "server_type": "stdio",
+          "instructions": "Read source files: {{upstream}}",
+          "credential_id": null
+        }
+      },
+      "label": "Read Source Code"
+    },
+    {
+      "id": "node-2",
+      "type": "agent",
+      "position": {
+        "x": 300,
+        "y": 200
+      },
+      "config": {
+        "agent": {
+          "name": "Test Generator",
+          "provider": "openai",
+          "model": "gpt-4o",
+          "system_prompt": "You are a test generation expert. Create comprehensive, production-quality unit tests that follow best practices and cover all edge cases.",
+          "temperature": 0.7,
+          "max_tokens": null,
+          "tools": [],
+          "knowledge_bases": [],
+          "instructions": [
+            "Generate comprehensive unit tests with pytest",
+            "Include: happy path, edge cases, error handling",
+            "Follow existing test patterns in the codebase",
+            "Add descriptive docstrings for each test function",
+            "Use appropriate fixtures and mocking where needed",
+            "Ensure tests are isolated and can run independently",
+            "Output complete test file content ready to write"
+          ],
+          "show_tool_calls": true,
+          "markdown": false
+        }
+      },
+      "label": "Generate Tests"
+    },
+    {
+      "id": "node-3",
+      "type": "mcp_server",
+      "position": {
+        "x": 500,
+        "y": 200
+      },
+      "config": {
+        "mcp_server": {
+          "server_name": "filesystem",
+          "server_url": "npx @modelcontextprotocol/server-filesystem /path/to/code",
+          "server_type": "stdio",
+          "instructions": "Write test files to tests/ directory from {{upstream}}",
+          "credential_id": null
+        }
+      },
+      "label": "Write Test Files"
+    },
+    {
+      "id": "node-4",
+      "type": "output",
+      "position": {
+        "x": 700,
+        "y": 200
+      },
+      "config": {
+        "input_output": {
+          "label": "Test Creation Confirmation",
+          "data_type": "text"
+        }
+      },
+      "label": "Output"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "source": "node-1",
+      "source_handle": null,
+      "target": "node-2",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-2",
+      "source": "node-2",
+      "source_handle": null,
+      "target": "node-3",
+      "target_handle": null,
+      "label": null
+    },
+    {
+      "id": "edge-3",
+      "source": "node-3",
+      "source_handle": null,
+      "target": "node-4",
+      "target_handle": null,
+      "label": null
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-02-09T00:00:00Z",
+    "updated_at": "2026-02-09T00:00:00Z",
+    "version": "1.0.0",
+    "author": "CoconutFlow Team",
+    "tags": ["test-generation", "filesystem", "mcp-server", "development", "automation"]
+  }
+}
