@@ -22,6 +22,7 @@ export default function Toolbar() {
   const toggleChat = useFlowStore((s) => s.toggleChat);
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [exportStatus, setExportStatus] = useState<'idle' | 'exporting' | 'exported' | 'error'>('idle');
   const [showFlowManager, setShowFlowManager] = useState(false);
 
   const handleRun = async () => {
@@ -65,6 +66,39 @@ export default function Toolbar() {
       toast.error('Save failed', msg);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
+
+  const handleExportPython = async () => {
+    if (!flowId) {
+      toast.warning('Save first', 'Please save your flow before exporting');
+      return;
+    }
+
+    setExportStatus('exporting');
+
+    try {
+      const pythonCode = await flowApi.exportPython(flowId);
+
+      // Download as file
+      const blob = new Blob([pythonCode], { type: 'text/x-python' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${getFlowDefinition().name.replace(/\s+/g, '_').toLowerCase()}.py`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setExportStatus('exported');
+      toast.success('Exported to Python', 'Workflow downloaded as .py file');
+      setTimeout(() => setExportStatus('idle'), 2000);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      toast.error('Export failed', msg);
+      setExportStatus('error');
+      setTimeout(() => setExportStatus('idle'), 3000);
     }
   };
 
@@ -149,6 +183,42 @@ export default function Toolbar() {
           </>
         )}
       </button>
+
+      {/* Export */}
+      <button
+        data-testid="export-python-button"
+        onClick={handleExportPython}
+        disabled={!flowId || exportStatus === 'exporting'}
+        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        title="Export as Python script"
+      >
+        {exportStatus === 'exporting' ? (
+          <>
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+            </svg>
+            <span>Exporting...</span>
+          </>
+        ) : exportStatus === 'exported' ? (
+          <>
+            <svg className="h-4 w-4 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+            </svg>
+            <span className="text-green-400">Exported</span>
+          </>
+        ) : (
+          <>
+            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" />
+              <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+            </svg>
+            <span>Export</span>
+          </>
+        )}
+      </button>
+
+      <div className="h-5 w-px bg-gray-700" />
 
       {/* Chat toggle */}
       <button

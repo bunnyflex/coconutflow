@@ -65,4 +65,14 @@ export const flowApi = {
   delete(id: string): Promise<void> {
     return request(`/api/flows/${id}`, { method: 'DELETE' });
   },
+
+  /** Export flow as Python script */
+  async exportPython(id: string): Promise<string> {
+    const res = await fetch(`${BASE_URL}/api/flows/${id}/export/python`);
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(`Export failed: ${res.status} ${body}`);
+    }
+    return res.text();
+  },
 };
