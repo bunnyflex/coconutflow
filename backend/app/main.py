@@ -53,12 +53,29 @@ app.include_router(credentials_router)
 # Health Check
 # ---------------------------------------------------------------------------
 
+from datetime import datetime
+
 
 @app.get("/", tags=["health"])
-async def health_check() -> dict:
-    """Health check endpoint."""
+async def root() -> dict:
+    """Root endpoint - basic service info."""
     return {
         "status": "ok",
         "service": "AgnoFlow API",
         "version": "0.1.0",
+    }
+
+
+@app.get("/health", tags=["health"])
+async def health_check() -> dict:
+    """
+    Health check endpoint for monitoring and CI/CD pipelines.
+
+    Returns service status and timestamp for readiness probes.
+    """
+    return {
+        "status": "healthy",
+        "service": "AgnoFlow API",
+        "version": "0.1.0",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
     }
