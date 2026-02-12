@@ -52,5 +52,5 @@ def test_generate_simple_workflow():
     code = exporter.generate(flow)
 
     assert "async def run_workflow" in code
-    assert "from agno import Agent" in code
+    assert "from agno.agent import Agent" in code
     assert "gpt-4o" in code

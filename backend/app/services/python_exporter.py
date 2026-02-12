@@ -32,7 +32,7 @@ class PythonExporter:
 
         # Always import base requirements
         self.imports.add("import asyncio")
-        self.imports.add("from agno import Agent")
+        self.imports.add("from agno.agent import Agent")
 
         # Topological sort (same as compiler)
         sorted_nodes = self._topological_sort(flow)
@@ -99,7 +99,7 @@ class PythonExporter:
 
     def _gen_agent(self, node: FlowNode):
         """Generate LLM agent code."""
-        self.imports.add("from agno import Agent")
+        self.imports.add("from agno.agent import Agent")
 
         if not node.config.agent:
             return
@@ -140,7 +140,7 @@ class PythonExporter:
 
     def _gen_knowledge_base(self, node: FlowNode):
         """Generate knowledge base code."""
-        self.imports.add("from agno import Knowledge")
+        self.imports.add("from agno.knowledge import Knowledge")
         self.imports.add("from agno.vectordb.pgvector import PgVector")
 
         if not node.config.knowledge_base:

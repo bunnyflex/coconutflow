@@ -59,7 +59,7 @@ def test_export_python_endpoint(test_flow_id):
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/plain; charset=utf-8"
     assert "async def run_workflow" in response.text
-    assert "from agno import Agent" in response.text
+    assert "from agno.agent import Agent" in response.text
     assert "gpt-4o" in response.text
 
 
