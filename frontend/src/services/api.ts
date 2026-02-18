@@ -106,4 +106,42 @@ export const flowApi = {
   useTemplate(templateId: string): Promise<FlowDefinition> {
     return request(`/api/templates/${templateId}/use`, { method: 'POST' });
   },
+
+  /** List flows, optionally filtered by user ID */
+  listByUser(userId?: string): Promise<FlowDefinition[]> {
+    const params = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
+    return request(`/api/flows/${params}`);
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Credentials API (Keys page)
+// ---------------------------------------------------------------------------
+
+export interface Credential {
+  id: string;
+  service_name: string;
+  credential_name: string;
+  created_at: string;
+}
+
+export interface CredentialCreate {
+  service_name: string;
+  credential_name: string;
+  api_key: string;
+}
+
+export const credentialsApi = {
+  list(): Promise<Credential[]> {
+    return request('/api/credentials/');
+  },
+  create(data: CredentialCreate): Promise<Credential> {
+    return request('/api/credentials/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  delete(id: string): Promise<void> {
+    return request(`/api/credentials/${id}`, { method: 'DELETE' });
+  },
 };
