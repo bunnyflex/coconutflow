@@ -91,4 +91,19 @@ export const flowApi = {
     }
     return res.text();
   },
+
+  /** List featured templates */
+  listFeatured(): Promise<FlowDefinition[]> {
+    return request('/api/templates/featured');
+  },
+
+  /** List community-published templates */
+  listCommunity(): Promise<FlowDefinition[]> {
+    return request('/api/templates/community');
+  },
+
+  /** Clone a template as a new user flow */
+  useTemplate(templateId: string): Promise<FlowDefinition> {
+    return request(`/api/templates/${templateId}/use`, { method: 'POST' });
+  },
 };

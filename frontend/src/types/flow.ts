@@ -250,6 +250,9 @@ export interface FlowDefinition {
   nodes: FlowNode[];
   edges: FlowEdge[];
   metadata: FlowMetadata;
+  is_featured?: boolean;   // NEW
+  is_public?: boolean;     // NEW
+  category?: string;       // NEW
 }
 
 // ---------------------------------------------------------------------------
