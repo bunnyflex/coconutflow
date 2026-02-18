@@ -17,7 +17,7 @@ export function CanvasPage() {
 
   useEffect(() => {
     if (id && id !== flowId) {
-      flowApi.get(id).then((flow) => loadFlow(flow as unknown as FlowDefinition));
+      flowApi.get(id).then((flow) => loadFlow(flow)).catch(console.error);
     }
   }, [id, flowId, loadFlow]);
 

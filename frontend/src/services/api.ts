@@ -36,17 +36,17 @@ export interface FlowListItem {
 
 export const flowApi = {
   /** List all saved flows */
-  list(): Promise<FlowListItem[]> {
+  list(): Promise<FlowDefinition[]> {
     return request('/api/flows');
   },
 
   /** Get a single flow by ID */
-  get(id: string): Promise<FlowListItem> {
+  get(id: string): Promise<FlowDefinition> {
     return request(`/api/flows/${id}`);
   },
 
   /** Create a new flow */
-  create(flow: FlowDefinition): Promise<FlowListItem> {
+  create(flow: FlowDefinition): Promise<FlowDefinition> {
     return request('/api/flows', {
       method: 'POST',
       body: JSON.stringify(transformFlowForBackend(flow)),
@@ -54,7 +54,7 @@ export const flowApi = {
   },
 
   /** Update an existing flow */
-  update(id: string, flow: FlowDefinition): Promise<FlowListItem> {
+  update(id: string, flow: FlowDefinition): Promise<FlowDefinition> {
     return request(`/api/flows/${id}`, {
       method: 'PUT',
       body: JSON.stringify(transformFlowForBackend(flow)),
