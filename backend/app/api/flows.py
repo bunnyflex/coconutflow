@@ -75,6 +75,9 @@ async def create_flow(flow: FlowDefinition) -> FlowDefinition:
         "nodes": [node.model_dump(mode='json') for node in flow.nodes],
         "edges": [edge.model_dump(mode='json') for edge in flow.edges],
         "metadata": flow.metadata.model_dump(mode='json') if hasattr(flow.metadata, 'model_dump') else flow.metadata,
+        "is_featured": flow.is_featured,
+        "is_public": flow.is_public,
+        "category": flow.category,
     }
 
     response = supabase.table("flows").insert(row).execute()
@@ -100,6 +103,9 @@ async def update_flow(flow_id: str, flow: FlowDefinition) -> FlowDefinition:
         "nodes": [node.model_dump(mode='json') for node in flow.nodes],
         "edges": [edge.model_dump(mode='json') for edge in flow.edges],
         "metadata": flow.metadata.model_dump(mode='json') if hasattr(flow.metadata, 'model_dump') else flow.metadata,
+        "is_featured": flow.is_featured,
+        "is_public": flow.is_public,
+        "category": flow.category,
     }
 
     response = supabase.table("flows").update(row).eq("id", flow_id).execute()
