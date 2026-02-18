@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import { useFlowStore, type FlowNodeData } from '../../store/flowStore';
+import { useAuthStore } from '../../store/authStore';
 import { flowWebSocket } from '../../services/websocket';
 import { flowApi } from '../../services/api';
 import type { InputNodeConfig } from '../../types/flow';
@@ -12,6 +13,7 @@ import { ShineBorder } from '../ui/magicui/shine-border';
 
 export default function Toolbar() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const isRunning = useFlowStore((s) => s.isRunning);
   const clearFlow = useFlowStore((s) => s.clearFlow);
   const undo = useFlowStore((s) => s.undo);
@@ -53,7 +55,7 @@ export default function Toolbar() {
     setSaveStatus('saving');
 
     try {
-      const flow = getFlowDefinition();
+      const flow = { ...getFlowDefinition(), user_id: user?.id ?? null };
 
       if (flowId) {
         await flowApi.update(flowId, flow);

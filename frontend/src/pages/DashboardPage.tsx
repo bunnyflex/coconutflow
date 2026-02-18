@@ -4,10 +4,12 @@ import { Plus, Loader2 } from 'lucide-react';
 import { AppShell } from '../components/layout/AppShell';
 import { FlowCard } from '../components/dashboard/FlowCard';
 import { flowApi } from '../services/api';
+import { useAuthStore } from '../store/authStore';
 import type { FlowDefinition } from '../types/flow';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [flows, setFlows] = useState<FlowDefinition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +20,7 @@ export function DashboardPage() {
     try {
       setLoading(true);
       setError(null);
-      const data = await flowApi.list();
+      const data = await flowApi.listByUser(user?.id);
       const sorted = [...data].sort((a, b) => {
         const aDate = a.metadata?.updated_at ?? '';
         const bDate = b.metadata?.updated_at ?? '';
