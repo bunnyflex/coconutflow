@@ -66,6 +66,22 @@ export const flowApi = {
     return request(`/api/flows/${id}`, { method: 'DELETE' });
   },
 
+  /** Duplicate a flow — fetches original and saves a copy */
+  async duplicate(id: string): Promise<FlowDefinition> {
+    const original = await this.get(id);
+    const copy = {
+      ...original,
+      id: undefined,
+      name: `${original.name} (copy)`,
+      metadata: {
+        ...original.metadata,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    };
+    return this.create(copy as FlowDefinition);
+  },
+
   /** Export flow as Python script */
   async exportPython(id: string): Promise<string> {
     const res = await fetch(`${BASE_URL}/api/flows/${id}/export/python`);
