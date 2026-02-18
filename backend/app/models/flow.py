@@ -253,3 +253,6 @@ class FlowDefinition(BaseModel):
     nodes: list[FlowNode] = Field(default_factory=list)
     edges: list[FlowEdge] = Field(default_factory=list)
     metadata: FlowMetadata = Field(default_factory=FlowMetadata)
+    is_featured: bool = False
+    is_public: bool = False
+    category: Optional[str] = None

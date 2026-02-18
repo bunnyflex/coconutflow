@@ -27,7 +27,10 @@ def _flow_from_db_row(row: dict[str, Any]) -> FlowDefinition:
             **row.get("metadata", {}),
             "created_at": row["created_at"],
             "updated_at": row["updated_at"],
-        }
+        },
+        is_featured=row.get("is_featured", False),
+        is_public=row.get("is_public", False),
+        category=row.get("category"),
     )
 
 
