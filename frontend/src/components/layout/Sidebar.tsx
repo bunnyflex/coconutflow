@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 const NAV_ITEMS = [
   { to: '/', icon: Home, label: 'Home' },
   { to: '/flows', icon: Layers, label: 'My Flows', comingSoon: true },
-  { to: '/templates', icon: BookOpen, label: 'Templates', comingSoon: true },
+  { to: '/templates', icon: BookOpen, label: 'Templates' },
   { to: '/keys', icon: Key, label: 'Keys', comingSoon: true },
   { to: '/docs', icon: FileText, label: 'Docs', comingSoon: true },
 ];
