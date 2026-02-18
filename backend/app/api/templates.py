@@ -4,7 +4,7 @@ Templates API — endpoints for browsing and using public/featured flows as temp
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -57,15 +57,15 @@ async def use_template(template_id: str) -> FlowDefinition:
 
     template = _flow_from_db_row(result.data[0])
 
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     new_flow = {
         "id": str(uuid.uuid4()),
         "name": f"{template.name} (copy)",
         "description": template.description,
-        "nodes": [n.model_dump() for n in template.nodes],
-        "edges": [e.model_dump() for e in template.edges],
+        "nodes": [n.model_dump(mode="json") for n in template.nodes],
+        "edges": [e.model_dump(mode="json") for e in template.edges],
         "metadata": {
-            **template.metadata.model_dump(),
+            **template.metadata.model_dump(mode="json"),
             "created_at": now,
             "updated_at": now,
         },
