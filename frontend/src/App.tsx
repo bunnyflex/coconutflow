@@ -1,36 +1,17 @@
-import { ReactFlowProvider } from 'reactflow';
-import FlowCanvas from './components/canvas/FlowCanvas';
-import NodeSidebar from './components/panels/NodeSidebar';
-import ConfigPanel from './components/panels/ConfigPanel';
-import ChatPanel from './components/panels/ChatPanel';
+import { Routes, Route } from 'react-router-dom';
+import { CanvasPage } from './pages/CanvasPage';
+import { DashboardPage } from './pages/DashboardPage';
 import ToastContainer from './components/ui/Toast';
-import { useFlowStore } from './store/flowStore';
 
-function App() {
-  const isChatOpen = useFlowStore((s) => s.isChatOpen);
-
+export default function App() {
   return (
-    <div className="flex h-screen w-screen bg-gray-950">
-      {/* Left Sidebar — draggable node library */}
-      <NodeSidebar />
-
-      {/* Centre Canvas */}
-      <main className="relative flex-1">
-        <ReactFlowProvider>
-          <FlowCanvas />
-        </ReactFlowProvider>
-      </main>
-
-      {/* Right Sidebar — node configuration panel */}
-      <ConfigPanel />
-
-      {/* Chat panel — slides in from the right */}
-      {isChatOpen && <ChatPanel />}
-
-      {/* Toast notifications */}
+    <>
+      <Routes>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/flow" element={<CanvasPage />} />
+        <Route path="/flow/:id" element={<CanvasPage />} />
+      </Routes>
       <ToastContainer />
-    </div>
+    </>
   );
 }
-
-export default App;
