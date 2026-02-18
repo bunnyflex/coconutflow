@@ -71,7 +71,7 @@ export const flowApi = {
     const original = await this.get(id);
     const copy = {
       ...original,
-      id: undefined,
+      id: crypto.randomUUID(),
       name: `${original.name} (copy)`,
       metadata: {
         ...original.metadata,

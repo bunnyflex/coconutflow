@@ -11,15 +11,15 @@ import type { FlowDefinition } from '../types/flow';
 
 export function CanvasPage() {
   const { id } = useParams<{ id: string }>();
-  const flowId = useFlowStore((s) => s.flowId);
-  const loadFlow = useFlowStore((s) => s.loadFlow);
-  const isChatOpen = useFlowStore((s) => s.isChatOpen);
+  const { flowId, loadFlow, isChatOpen, clearFlow } = useFlowStore();
 
   useEffect(() => {
-    if (id && id !== flowId) {
+    if (!id) {
+      clearFlow();
+    } else if (id !== flowId) {
       flowApi.get(id).then((flow) => loadFlow(flow)).catch(console.error);
     }
-  }, [id, flowId, loadFlow]);
+  }, [id]);
 
   return (
     <div className="flex h-screen w-screen bg-gray-950">

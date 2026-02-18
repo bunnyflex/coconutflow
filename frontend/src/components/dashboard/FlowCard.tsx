@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoreVertical, ExternalLink, Copy, Trash2, Download } from 'lucide-react';
 import type { FlowDefinition, NodeType } from '../../types/flow';
+import { flowApi } from '../../services/api';
 
 // Accent colors matching NodeShell.tsx exactly (gradient hex values)
 const NODE_COLORS: Record<NodeType, string> = {
@@ -38,9 +39,9 @@ export function FlowCard({ flow, onDelete, onDuplicate }: FlowCardProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Collect unique node types (up to 5 dots shown)
-  const uniqueTypes = [...new Set(flow.nodes.map((n) => n.type))] as NodeType[];
-  const nodeTypes = uniqueTypes.slice(0, 5);
-  const extraCount = flow.nodes.length > 5 ? flow.nodes.length - 5 : 0;
+  const uniqueTypes = [...new Set(flow.nodes.map((n) => n.type))];
+  const nodeTypes = uniqueTypes.slice(0, 5) as NodeType[];
+  const extraCount = uniqueTypes.length > 5 ? uniqueTypes.length - 5 : 0;
 
   // Close menu on click outside
   useEffect(() => {
@@ -133,7 +134,28 @@ export function FlowCard({ flow, onDelete, onDuplicate }: FlowCardProps) {
           {[
             { icon: ExternalLink, label: 'Open', action: () => navigate(`/flow/${flow.id}`), danger: false },
             { icon: Copy, label: 'Duplicate', action: () => { onDuplicate(flow); setMenuOpen(false); }, danger: false },
-            { icon: Download, label: 'Export Python', action: () => { window.open(`/api/flows/${flow.id}/export/python`); setMenuOpen(false); }, danger: false },
+            {
+              icon: Download,
+              label: 'Export Python',
+              action: async () => {
+                setMenuOpen(false);
+                try {
+                  const code = await flowApi.exportPython(flow.id);
+                  const blob = new Blob([code], { type: 'text/x-python' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${flow.name.replace(/\s+/g, '_').toLowerCase()}.py`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                } catch {
+                  console.error('Export failed');
+                }
+              },
+              danger: false,
+            },
             { icon: Trash2, label: 'Delete', action: () => { onDelete(flow.id); setMenuOpen(false); }, danger: true },
           ].map(({ icon: Icon, label, action, danger }) => (
             <button

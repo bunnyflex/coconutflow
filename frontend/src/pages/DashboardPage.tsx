@@ -38,8 +38,12 @@ export function DashboardPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this flow? This cannot be undone.')) return;
-    await flowApi.delete(id);
-    setFlows((prev) => prev.filter((f) => f.id !== id));
+    try {
+      await flowApi.delete(id);
+      setFlows((prev) => prev.filter((f) => f.id !== id));
+    } catch {
+      setError('Failed to delete flow. Please try again.');
+    }
   };
 
   const handleDuplicate = async (flow: FlowDefinition) => {
