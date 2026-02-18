@@ -11,6 +11,8 @@ export function DashboardPage() {
   const [flows, setFlows] = useState<FlowDefinition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [activeTag, setActiveTag] = useState<string | null>(null);
 
   const loadFlows = useCallback(async () => {
     try {
@@ -44,6 +46,21 @@ export function DashboardPage() {
     const copy = await flowApi.duplicate(flow.id);
     setFlows((prev) => [copy, ...prev]);
   };
+
+  // All unique tags across all flows, sorted alphabetically
+  const allTags = [...new Set(flows.flatMap((f) => f.metadata.tags ?? []))].sort();
+
+  // Filtered flows for the All Flows grid (Recent strip is NOT filtered)
+  const filteredFlows = flows.filter((f) => {
+    const q = search.toLowerCase();
+    const matchesSearch =
+      !q ||
+      f.name?.toLowerCase().includes(q) ||
+      f.description?.toLowerCase().includes(q) ||
+      (f.metadata.tags ?? []).some((t) => t.toLowerCase().includes(q));
+    const matchesTag = !activeTag || (f.metadata.tags ?? []).includes(activeTag);
+    return matchesSearch && matchesTag;
+  });
 
   const recent = flows.slice(0, 4);
 
@@ -107,12 +124,57 @@ export function DashboardPage() {
 
             {/* All flows grid */}
             <section>
-              <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">All Flows</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {flows.map((flow) => (
-                  <FlowCard key={flow.id} flow={flow} onDelete={handleDelete} onDuplicate={handleDuplicate} />
-                ))}
+              <div className="flex items-center gap-3 mb-4 flex-wrap">
+                <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">All Flows</h2>
+
+                {/* Search input */}
+                <div className="flex-1 min-w-48 max-w-xs">
+                  <input
+                    type="text"
+                    placeholder="Search flows..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700/60 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/60 transition-colors"
+                  />
+                </div>
+
+                {/* Tag chips */}
+                {allTags.length > 0 && (
+                  <div className="flex gap-1.5 flex-wrap">
+                    {allTags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                        className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                          activeTag === tag
+                            ? 'bg-indigo-500/20 border-indigo-500/60 text-indigo-400'
+                            : 'bg-gray-800 border-gray-700/60 text-gray-400 hover:text-white hover:border-gray-600'
+                        }`}
+                      >
+                        #{tag}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+
+              {filteredFlows.length === 0 && (search || activeTag) ? (
+                <p className="text-gray-500 text-sm py-8 text-center">
+                  No flows match your filters.{' '}
+                  <button
+                    onClick={() => { setSearch(''); setActiveTag(null); }}
+                    className="text-indigo-400 hover:text-indigo-300 underline"
+                  >
+                    Clear filters
+                  </button>
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {filteredFlows.map((flow) => (
+                    <FlowCard key={flow.id} flow={flow} onDelete={handleDelete} onDuplicate={handleDuplicate} />
+                  ))}
+                </div>
+              )}
             </section>
           </>
         )}
