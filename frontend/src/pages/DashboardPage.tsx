@@ -48,7 +48,7 @@ export function DashboardPage() {
   };
 
   // All unique tags across all flows, sorted alphabetically
-  const allTags = [...new Set(flows.flatMap((f) => f.metadata.tags ?? []))].sort();
+  const allTags = [...new Set(flows.flatMap((f) => f.metadata?.tags ?? []))].sort();
 
   // Filtered flows for the All Flows grid (Recent strip is NOT filtered)
   const filteredFlows = flows.filter((f) => {
@@ -57,8 +57,8 @@ export function DashboardPage() {
       !q ||
       f.name?.toLowerCase().includes(q) ||
       f.description?.toLowerCase().includes(q) ||
-      (f.metadata.tags ?? []).some((t) => t.toLowerCase().includes(q));
-    const matchesTag = !activeTag || (f.metadata.tags ?? []).includes(activeTag);
+      (f.metadata?.tags ?? []).some((t) => t.toLowerCase().includes(q));
+    const matchesTag = !activeTag || (f.metadata?.tags ?? []).includes(activeTag);
     return matchesSearch && matchesTag;
   });
 
