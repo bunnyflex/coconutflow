@@ -256,3 +256,4 @@ class FlowDefinition(BaseModel):
     is_featured: bool = False
     is_public: bool = False
     category: Optional[str] = None
+    user_id: Optional[str] = None

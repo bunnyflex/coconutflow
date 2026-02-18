@@ -5,7 +5,7 @@ Endpoints: /api/flows
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException
 
@@ -31,15 +31,19 @@ def _flow_from_db_row(row: dict[str, Any]) -> FlowDefinition:
         is_featured=row.get("is_featured", False),
         is_public=row.get("is_public", False),
         category=row.get("category"),
+        user_id=row.get("user_id"),
     )
 
 
 @router.get("/", response_model=list[FlowDefinition])
-async def list_flows() -> list[FlowDefinition]:
-    """List all saved flows."""
+async def list_flows(user_id: Optional[str] = None) -> list[FlowDefinition]:
+    """List all saved flows, optionally filtered by user_id."""
     supabase = get_supabase_client()
 
-    response = supabase.table("flows").select("*").order("created_at", desc=True).execute()
+    query = supabase.table("flows").select("*").order("created_at", desc=True)
+    if user_id:
+        query = query.eq("user_id", user_id)
+    response = query.execute()
 
     return [_flow_from_db_row(row) for row in response.data]
 
@@ -78,6 +82,7 @@ async def create_flow(flow: FlowDefinition) -> FlowDefinition:
         "is_featured": flow.is_featured,
         "is_public": flow.is_public,
         "category": flow.category,
+        "user_id": flow.user_id,
     }
 
     response = supabase.table("flows").insert(row).execute()
@@ -106,6 +111,7 @@ async def update_flow(flow_id: str, flow: FlowDefinition) -> FlowDefinition:
         "is_featured": flow.is_featured,
         "is_public": flow.is_public,
         "category": flow.category,
+        "user_id": flow.user_id,
     }
 
     response = supabase.table("flows").update(row).eq("id", flow_id).execute()
