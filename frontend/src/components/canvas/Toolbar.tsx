@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Home } from 'lucide-react';
 import { useFlowStore, type FlowNodeData } from '../../store/flowStore';
 import { flowWebSocket } from '../../services/websocket';
 import { flowApi } from '../../services/api';
@@ -9,6 +11,7 @@ import { ShimmerButton } from '../ui/magicui/shimmer-button';
 import { ShineBorder } from '../ui/magicui/shine-border';
 
 export default function Toolbar() {
+  const navigate = useNavigate();
   const isRunning = useFlowStore((s) => s.isRunning);
   const clearFlow = useFlowStore((s) => s.clearFlow);
   const undo = useFlowStore((s) => s.undo);
@@ -110,6 +113,18 @@ export default function Toolbar() {
   return (
     <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-gray-700 bg-gray-900/90 px-3 py-2 shadow-lg backdrop-blur-sm">
       <ShineBorder shineColor={["#6366f1", "#3b82f6"]} duration={10} borderWidth={1} />
+      {/* Home */}
+      <button
+        onClick={() => navigate('/')}
+        title="Back to dashboard"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700/60 rounded-lg transition-colors border border-gray-700/40"
+      >
+        <Home size={13} />
+        <span>Home</span>
+      </button>
+
+      <div className="h-5 w-px bg-gray-700" />
+
       {/* Run */}
       {isRunning ? (
         <button
