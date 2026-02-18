@@ -240,6 +240,7 @@ export interface FlowMetadata {
   created_at: string;
   updated_at: string;
   version: string;
+  tags?: string[];
 }
 
 export interface FlowDefinition {

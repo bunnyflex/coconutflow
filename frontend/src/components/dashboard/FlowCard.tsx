@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoreVertical, ExternalLink, Copy, Trash2, Download } from 'lucide-react';
 import type { FlowDefinition, NodeType } from '../../types/flow';
@@ -35,15 +35,26 @@ interface FlowCardProps {
 export function FlowCard({ flow, onDelete, onDuplicate }: FlowCardProps) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Collect unique node types (up to 5 dots shown)
   const uniqueTypes = [...new Set(flow.nodes.map((n) => n.type))] as NodeType[];
   const nodeTypes = uniqueTypes.slice(0, 5);
   const extraCount = flow.nodes.length > 5 ? flow.nodes.length - 5 : 0;
 
-  // FlowMetadata has no tags field — cast through unknown for forward-compat extension
-  const meta = flow.metadata as FlowDefinition['metadata'] & { tags?: string[] };
-  const tags: string[] = meta.tags ?? [];
+  // Close menu on click outside
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
+
+  const tags: string[] = flow.metadata.tags ?? [];
   const updatedAt: string = flow.metadata.updated_at;
 
   return (
@@ -115,6 +126,7 @@ export function FlowCard({ flow, onDelete, onDuplicate }: FlowCardProps) {
       {/* Kebab dropdown */}
       {menuOpen && (
         <div
+          ref={menuRef}
           className="absolute right-3 top-10 z-20 bg-gray-900 border border-gray-700/60 rounded-lg shadow-xl py-1 w-44"
           onClick={(e) => e.stopPropagation()}
         >
