@@ -241,6 +241,7 @@ export interface FlowMetadata {
   updated_at: string;
   version: string;
   tags?: string[];
+  author?: string;
 }
 
 export interface FlowDefinition {
