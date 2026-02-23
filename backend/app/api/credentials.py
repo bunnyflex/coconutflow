@@ -32,7 +32,7 @@ class CredentialResponse(BaseModel):
 
 
 @router.post("/", response_model=CredentialResponse, status_code=201)
-async def create_credential(credential: CredentialCreate) -> dict[str, Any]:
+async def create_credential(credential: CredentialCreate, user_id: str = "system") -> dict[str, Any]:
     """
     Store a new encrypted credential.
 
@@ -50,7 +50,7 @@ async def create_credential(credential: CredentialCreate) -> dict[str, Any]:
         "service_name": credential.service_name,
         "credential_name": credential.credential_name,
         "encrypted_key": encrypted_key,
-        "user_id": "system",  # TODO: Multi-tenant support
+        "user_id": user_id,
     }
 
     response = supabase.table("credentials").insert(row).execute()
@@ -67,9 +67,9 @@ async def create_credential(credential: CredentialCreate) -> dict[str, Any]:
 
 
 @router.get("/", response_model=list[CredentialResponse])
-async def list_credentials() -> list[dict[str, Any]]:
+async def list_credentials(user_id: str = "system") -> list[dict[str, Any]]:
     """
-    List all credentials (without API keys).
+    List credentials for a user (without API keys).
 
     Returns credential metadata only, never the encrypted or plain keys.
     """
@@ -77,14 +77,14 @@ async def list_credentials() -> list[dict[str, Any]]:
 
     response = supabase.table("credentials").select(
         "id, service_name, credential_name, created_at"
-    ).order("created_at", desc=True).execute()
+    ).eq("user_id", user_id).order("created_at", desc=True).execute()
 
     return response.data
 
 
 @router.delete("/{credential_id}", status_code=204)
-async def delete_credential(credential_id: str) -> None:
-    """Delete a credential by ID."""
+async def delete_credential(credential_id: str, user_id: str = "system") -> None:
+    """Delete a credential by ID, scoped to user."""
     supabase = get_supabase_client()
 
     # Check if exists
@@ -93,8 +93,8 @@ async def delete_credential(credential_id: str) -> None:
     if not existing.data:
         raise HTTPException(status_code=404, detail="Credential not found")
 
-    # Delete
-    supabase.table("credentials").delete().eq("id", credential_id).execute()
+    # Delete (scoped to user for safety)
+    supabase.table("credentials").delete().eq("id", credential_id).eq("user_id", user_id).execute()
 
 
 @router.get("/{credential_id}/decrypt")

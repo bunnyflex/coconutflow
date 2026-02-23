@@ -132,16 +132,19 @@ export interface CredentialCreate {
 }
 
 export const credentialsApi = {
-  list(): Promise<Credential[]> {
-    return request('/api/credentials/');
+  list(userId?: string): Promise<Credential[]> {
+    const params = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
+    return request(`/api/credentials/${params}`);
   },
-  create(data: CredentialCreate): Promise<Credential> {
-    return request('/api/credentials/', {
+  create(data: CredentialCreate, userId?: string): Promise<Credential> {
+    const params = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
+    return request(`/api/credentials/${params}`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
-  delete(id: string): Promise<void> {
-    return request(`/api/credentials/${id}`, { method: 'DELETE' });
+  delete(id: string, userId?: string): Promise<void> {
+    const params = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
+    return request(`/api/credentials/${id}${params}`, { method: 'DELETE' });
   },
 };
