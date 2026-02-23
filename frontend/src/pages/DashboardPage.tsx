@@ -105,14 +105,27 @@ export function DashboardPage() {
         )}
 
         {!loading && !error && flows.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-sm">No flows yet.</p>
-            <button
-              onClick={() => navigate('/flow')}
-              className="mt-4 text-indigo-400 hover:text-indigo-300 text-sm underline"
-            >
-              Create your first flow &rarr;
-            </button>
+          <div className="text-center py-16 space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-white">Build your first AI workflow</h2>
+              <p className="text-gray-400 text-sm max-w-md mx-auto">
+                Drag nodes onto a canvas, connect them, and run powerful AI pipelines. Start from a template or create from scratch.
+              </p>
+            </div>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => navigate('/flow')}
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                Create Flow
+              </button>
+              <button
+                onClick={() => navigate('/templates')}
+                className="px-5 py-2.5 border border-gray-700 hover:border-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                Browse Templates
+              </button>
+            </div>
           </div>
         )}
 
