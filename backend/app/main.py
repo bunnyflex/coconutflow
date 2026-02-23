@@ -7,6 +7,8 @@ Run with:
 
 from __future__ import annotations
 
+import os
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -31,12 +33,14 @@ app = FastAPI(
 )
 
 # ---------------------------------------------------------------------------
-# CORS Middleware (allow all origins for development; restrict in production)
+# CORS Middleware (env-var-driven; defaults to localhost for development)
 # ---------------------------------------------------------------------------
+
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174").split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Lock down for production
+    allow_origins=[o.strip() for o in allowed_origins],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
