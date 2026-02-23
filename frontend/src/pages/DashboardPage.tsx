@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Loader2 } from 'lucide-react';
 import { AppShell } from '../components/layout/AppShell';
 import { FlowCard } from '../components/dashboard/FlowCard';
+import { WelcomeModal } from '../components/onboarding/WelcomeModal';
 import { flowApi } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import type { FlowDefinition } from '../types/flow';
@@ -15,6 +16,7 @@ export function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('coconut_has_seen_welcome'));
 
   const loadFlows = useCallback(async () => {
     try {
@@ -185,6 +187,7 @@ export function DashboardPage() {
           </>
         )}
       </div>
+      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
     </AppShell>
   );
 }
