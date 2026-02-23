@@ -91,14 +91,19 @@ async def create_flow(flow: FlowDefinition) -> FlowDefinition:
 
 
 @router.put("/{flow_id}", response_model=FlowDefinition)
-async def update_flow(flow_id: str, flow: FlowDefinition) -> FlowDefinition:
+async def update_flow(flow_id: str, flow: FlowDefinition, user_id: Optional[str] = None) -> FlowDefinition:
     """Update an existing flow."""
     supabase = get_supabase_client()
 
     # Check if flow exists
-    existing = supabase.table("flows").select("id").eq("id", flow_id).execute()
+    existing = supabase.table("flows").select("*").eq("id", flow_id).execute()
     if not existing.data:
         raise HTTPException(status_code=404, detail="Flow not found")
+
+    # Enforce ownership
+    row = existing.data[0]
+    if user_id and row.get("user_id") and row["user_id"] != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this flow")
 
     # Update flow
     flow.id = flow_id  # Ensure ID matches URL
@@ -120,14 +125,19 @@ async def update_flow(flow_id: str, flow: FlowDefinition) -> FlowDefinition:
 
 
 @router.delete("/{flow_id}", status_code=204)
-async def delete_flow(flow_id: str) -> None:
+async def delete_flow(flow_id: str, user_id: Optional[str] = None) -> None:
     """Delete a flow."""
     supabase = get_supabase_client()
 
     # Check if flow exists
-    existing = supabase.table("flows").select("id").eq("id", flow_id).execute()
+    existing = supabase.table("flows").select("*").eq("id", flow_id).execute()
     if not existing.data:
         raise HTTPException(status_code=404, detail="Flow not found")
+
+    # Enforce ownership
+    row = existing.data[0]
+    if user_id and row.get("user_id") and row["user_id"] != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this flow")
 
     # Delete flow
     supabase.table("flows").delete().eq("id", flow_id).execute()
