@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { MarkdownHooks as Markdown } from 'react-markdown';
 import { useFlowStore } from '../../store/flowStore';
 import { flowWebSocket } from '../../services/websocket';
+import { credentialsApi } from '../../services/api';
 import { toast } from '../ui/Toast';
 import { TypingAnimation } from '../ui/magicui/typing-animation';
 import { RippleButton } from '../ui/magicui/ripple-button';
@@ -36,6 +37,17 @@ export default function ChatPanel() {
     if (nodes.length === 0) {
       toast.warning('No flow', 'Build a flow on the canvas first');
       return;
+    }
+
+    // Check if user has any API keys before running
+    try {
+      const creds = await credentialsApi.list();
+      if (creds.length === 0) {
+        toast.warning('No API key', 'Add an API key in Keys to run flows');
+        return;
+      }
+    } catch {
+      // Don't block execution if credentials check fails
     }
 
     // Add user message to chat
