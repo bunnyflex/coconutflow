@@ -23,9 +23,6 @@ export default function Toolbar() {
   const getFlowDefinition = useFlowStore((s) => s.getFlowDefinition);
   const setFlowId = useFlowStore((s) => s.setFlowId);
 
-  const isChatOpen = useFlowStore((s) => s.isChatOpen);
-  const toggleChat = useFlowStore((s) => s.toggleChat);
-
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [exportStatus, setExportStatus] = useState<'idle' | 'exporting' | 'exported' | 'error'>('idle');
   const [showFlowManager, setShowFlowManager] = useState(false);
@@ -233,24 +230,6 @@ export default function Toolbar() {
             <span>Export</span>
           </>
         )}
-      </button>
-
-      <div className="h-5 w-px bg-gray-700" />
-
-      {/* Chat toggle */}
-      <button
-        data-testid="chat-toggle"
-        onClick={toggleChat}
-        className={`rounded-lg p-2 transition-colors ${
-          isChatOpen
-            ? 'bg-indigo-600 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
-        }`}
-        title="Toggle chat"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
       </button>
 
       <div className="h-5 w-px bg-gray-700" />

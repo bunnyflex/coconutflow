@@ -1,43 +1,45 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ReactFlowProvider } from 'reactflow';
-import FlowCanvas from '../components/canvas/FlowCanvas';
-import NodeSidebar from '../components/panels/NodeSidebar';
-import ConfigPanel from '../components/panels/ConfigPanel';
-import ChatPanel from '../components/panels/ChatPanel';
 import { useFlowStore } from '../store/flowStore';
 import { flowApi } from '../services/api';
-
+import FlowCanvas from '../components/canvas/FlowCanvas';
+import AIChatPanel from '../components/panels/AIChatPanel';
+import NodeSidebar from '../components/panels/NodeSidebar';
+import ConfigPanel from '../components/panels/ConfigPanel';
 
 export function CanvasPage() {
   const { id } = useParams<{ id: string }>();
-  const { flowId, loadFlow, isChatOpen, clearFlow } = useFlowStore();
+  const loadFlow = useFlowStore((s) => s.loadFlow);
+  const clearFlow = useFlowStore((s) => s.clearFlow);
+  const flowId = useFlowStore((s) => s.flowId);
 
   useEffect(() => {
     if (!id) {
-      clearFlow();
-    } else if (id !== flowId) {
-      flowApi.get(id).then((flow) => loadFlow(flow)).catch(console.error);
+      if (flowId) clearFlow();
+      return;
+    }
+    if (id !== flowId) {
+      flowApi.get(id).then(loadFlow).catch(console.error);
     }
   }, [id]);
 
   return (
     <div className="flex h-screen w-screen bg-gray-950">
-      {/* Centre Canvas */}
-      <main className="relative flex-1">
+      {/* Left: AI Chat Panel (handles its own collapsed/expanded) */}
+      <AIChatPanel />
+
+      {/* Center: Canvas area with overlays */}
+      <div className="flex-1 relative overflow-hidden">
         <ReactFlowProvider>
           <FlowCanvas />
         </ReactFlowProvider>
-
-        {/* Node library — collapsible overlay on right side */}
+        {/* Overlay: Node sidebar (right side, collapsible +) */}
         <NodeSidebar />
-      </main>
+      </div>
 
-      {/* Right Sidebar — node configuration panel */}
+      {/* Right: Config panel (opens when node selected) */}
       <ConfigPanel />
-
-      {/* Chat panel — slides in from the right */}
-      {isChatOpen && <ChatPanel />}
     </div>
   );
 }
