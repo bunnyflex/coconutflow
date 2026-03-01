@@ -21,6 +21,7 @@ from app.api.websocket import router as websocket_router
 from app.api.credentials import router as credentials_router
 from app.api.export import router as export_router
 from app.api.templates import router as templates_router
+from app.api.chat import router as chat_router
 
 # ---------------------------------------------------------------------------
 # Application
@@ -56,6 +57,7 @@ app.include_router(websocket_router)
 app.include_router(credentials_router)
 app.include_router(export_router)
 app.include_router(templates_router)
+app.include_router(chat_router)
 
 # ---------------------------------------------------------------------------
 # Health Check
