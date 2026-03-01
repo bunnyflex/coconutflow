@@ -10,6 +10,7 @@
  */
 
 import type { FlowDefinition } from '../types/flow';
+import type { ChatResponse } from '../types/mutations';
 import { transformFlowForBackend } from './flowTransform';
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
@@ -130,6 +131,33 @@ export interface CredentialCreate {
   credential_name: string;
   api_key: string;
 }
+
+// ---------------------------------------------------------------------------
+// Chat API (AI assistant chat with flow mutations)
+// ---------------------------------------------------------------------------
+
+export const chatApi = {
+  /** Send chat messages with current flow state; receive a reply + optional mutations */
+  async send(
+    messages: { role: string; content: string }[],
+    flowState: { nodes: any[]; edges: any[] }
+  ): Promise<ChatResponse> {
+    const response = await fetch(`${BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages, flow_state: flowState }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error((err as any).detail || 'Chat request failed');
+    }
+    return response.json() as Promise<ChatResponse>;
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Credentials API (Keys page)
+// ---------------------------------------------------------------------------
 
 export const credentialsApi = {
   list(userId?: string): Promise<Credential[]> {
