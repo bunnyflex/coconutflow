@@ -17,6 +17,7 @@ import type {
   FlowDefinition,
   ChatMessage,
 } from '../types/flow';
+import type { FlowMutation } from '../types/mutations';
 
 // ---------------------------------------------------------------------------
 // React Flow node data shape
@@ -105,6 +106,9 @@ interface FlowState {
   // Undo
   pushUndo: () => void;
   undo: () => void;
+
+  // AI mutations
+  applyMutations: (mutations: FlowMutation[]) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -415,5 +419,84 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       edges: last.edges,
       undoStack: undoStack.slice(0, -1),
     });
+  },
+
+  // -----------------------------------------------------------------------
+  // AI mutations (batch)
+  // -----------------------------------------------------------------------
+
+  applyMutations: (mutations) => {
+    const state = get();
+    state.pushUndo();
+
+    let newNodes = [...state.nodes];
+    let newEdges = [...state.edges];
+
+    for (const m of mutations) {
+      switch (m.type) {
+        case 'add_node': {
+          const nodeType = m.node_type as NodeType;
+          const defaults = getDefaultConfig(nodeType);
+          const config = { ...defaults, ...m.config } as NodeConfig;
+          const node: Node<FlowNodeData> = {
+            id: m.node_id,
+            type: m.node_type,
+            position: m.position,
+            data: {
+              nodeType,
+              label: m.label || getNodeLabel(nodeType),
+              config,
+              status: 'idle',
+            },
+          };
+          newNodes = [...newNodes, node];
+          break;
+        }
+        case 'remove_node': {
+          newNodes = newNodes.filter((n) => n.id !== m.node_id);
+          newEdges = newEdges.filter((e) => e.source !== m.node_id && e.target !== m.node_id);
+          break;
+        }
+        case 'update_config': {
+          newNodes = newNodes.map((n) =>
+            n.id === m.node_id
+              ? { ...n, data: { ...n.data, config: { ...n.data.config, ...m.config } as NodeConfig } }
+              : n,
+          );
+          break;
+        }
+        case 'update_label': {
+          newNodes = newNodes.map((n) =>
+            n.id === m.node_id
+              ? { ...n, data: { ...n.data, label: m.label } }
+              : n,
+          );
+          break;
+        }
+        case 'add_edge': {
+          const edgeId = `e-${m.source}-${m.target}`;
+          const edge: Edge = {
+            id: edgeId,
+            source: m.source,
+            target: m.target,
+            sourceHandle: m.source_handle || 'output',
+            targetHandle: m.target_handle || 'input',
+            type: 'animatedBeam',
+          };
+          newEdges = [...newEdges, edge];
+          break;
+        }
+        case 'remove_edge': {
+          if (m.edge_id) {
+            newEdges = newEdges.filter((e) => e.id !== m.edge_id);
+          } else if (m.source && m.target) {
+            newEdges = newEdges.filter((e) => !(e.source === m.source && e.target === m.target));
+          }
+          break;
+        }
+      }
+    }
+
+    set({ nodes: newNodes, edges: newEdges });
   },
 }));
