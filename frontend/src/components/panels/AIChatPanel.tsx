@@ -1,15 +1,22 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, PanelLeftClose, PanelLeftOpen, Sparkles } from 'lucide-react';
 import { useFlowStore } from '../../store/flowStore';
+import { chatApi } from '../../services/api';
+import { autoLayoutMutations } from '../../utils/autoLayout';
 import type { ChatMessage } from '../../types/flow';
+import type { FlowMutation } from '../../types/mutations';
 
 export default function AIChatPanel() {
   const messages = useFlowStore((s) => s.chatMessages);
   const addMessage = useFlowStore((s) => s.addChatMessage);
   const isChatOpen = useFlowStore((s) => s.isChatOpen);
   const setChatOpen = useFlowStore((s) => s.setChatOpen);
+  const applyMutations = useFlowStore((s) => s.applyMutations);
+  const nodes = useFlowStore((s) => s.nodes);
+  const edges = useFlowStore((s) => s.edges);
 
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -21,13 +28,56 @@ export default function AIChatPanel() {
     if (isChatOpen) inputRef.current?.focus();
   }, [isChatOpen]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const text = input.trim();
-    if (!text) return;
+    if (!text || isLoading) return;
+
     addMessage('user', text);
     setInput('');
-    // TODO Phase 2: Send to /api/chat with flow state, apply mutations
-    addMessage('assistant', 'AI chat backend coming soon. For now, use the canvas to build your flow!');
+    setIsLoading(true);
+
+    try {
+      // Build message history for the API
+      const apiMessages = [
+        ...messages.filter((m) => m.role !== 'system').map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+        { role: 'user' as const, content: text },
+      ];
+
+      // Send current flow state
+      const flowState = {
+        nodes: nodes.map((n) => ({
+          id: n.id,
+          type: n.type,
+          config: n.data.config,
+          label: n.data.label,
+        })),
+        edges: edges.map((e) => ({
+          source: e.source,
+          target: e.target,
+          source_handle: e.sourceHandle,
+          target_handle: e.targetHandle,
+        })),
+      };
+
+      const response = await chatApi.send(apiMessages, flowState);
+
+      // Apply mutations if any
+      if (response.mutations && response.mutations.length > 0) {
+        const laid = autoLayoutMutations(response.mutations as FlowMutation[]);
+        applyMutations(laid);
+      }
+
+      // Show AI message
+      addMessage('assistant', response.message || 'Done!');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong';
+      addMessage('system', msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -78,6 +128,13 @@ export default function AIChatPanel() {
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-gray-800/80 px-3 py-2 rounded-xl text-sm text-gray-400 animate-pulse">
+              Thinking...
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -95,7 +152,7 @@ export default function AIChatPanel() {
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim()}
+            disabled={!input.trim() || isLoading}
             className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 disabled:hover:bg-indigo-600 text-white rounded-lg transition-colors"
           >
             <Send size={14} />
