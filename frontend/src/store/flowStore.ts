@@ -186,7 +186,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
 
   // Chat
   chatMessages: [],
-  isChatOpen: false,
+  isChatOpen: true,
 
   // Node sidebar
   isNodeSidebarOpen: false,
