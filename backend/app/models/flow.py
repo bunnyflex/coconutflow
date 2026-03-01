@@ -19,8 +19,10 @@ from pydantic import BaseModel, Field
 class NodeType(str, Enum):
     """All supported node types in the flow canvas."""
     AGENT = "agent"
+    LLM_AGENT = "llm_agent"       # Frontend alias for AGENT
     TEAM = "team"
     TOOL = "tool"
+    WEB_SEARCH = "web_search"     # Frontend alias for TOOL (DuckDuckGo)
     KNOWLEDGE_BASE = "knowledge_base"
     PROMPT = "prompt"
     INPUT = "input"

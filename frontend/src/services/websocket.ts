@@ -27,8 +27,6 @@ export interface WebSocketEvent {
 
 class FlowWebSocket {
   private ws: WebSocket | null = null;
-  private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
   private listeners: EventHandler[] = [];
 
   connect(): Promise<void> {

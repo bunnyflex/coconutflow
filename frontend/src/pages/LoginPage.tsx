@@ -3,12 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
-type Tab = 'signin' | 'signup';
-
 export function LoginPage() {
   const navigate = useNavigate();
   const { signIn, signUp, signInWithGoogle } = useAuthStore();
-  const [tab, setTab] = useState<Tab>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,16 +17,32 @@ export function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
+
     try {
-      if (tab === 'signin') {
-        await signIn(email, password);
-        navigate('/');
+      // Try sign-in first
+      await signIn(email, password);
+      navigate('/');
+    } catch (signInErr: unknown) {
+      const msg = signInErr instanceof Error ? signInErr.message : '';
+
+      // If user doesn't exist, auto-create account
+      if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
+        try {
+          await signUp(email, password);
+          setMessage('Account created! Check your email for a confirmation link, then sign in.');
+        } catch (signUpErr: unknown) {
+          const signUpMsg = signUpErr instanceof Error ? signUpErr.message : '';
+          if (signUpMsg.includes('already registered') || signUpMsg.includes('already exists')) {
+            setError('Incorrect password. Please try again.');
+          } else if (signUpMsg.includes('Password should be at least')) {
+            setError(signUpMsg);
+          } else {
+            setError(signUpMsg || 'Authentication failed');
+          }
+        }
       } else {
-        await signUp(email, password);
-        setMessage('Check your email for a confirmation link.');
+        setError(msg || 'Authentication failed');
       }
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Authentication failed');
     } finally {
       setLoading(false);
     }
@@ -52,24 +65,10 @@ export function LoginPage() {
         <div className="text-center mb-8">
           <span className="text-4xl">🥥</span>
           <h1 className="text-xl font-semibold text-white mt-2">CoconutFlow</h1>
+          <p className="text-gray-500 text-sm mt-1">Sign in or create an account</p>
         </div>
 
         <div className="bg-gray-900 border border-gray-700/60 rounded-2xl p-6">
-          {/* Tabs */}
-          <div className="flex mb-6 bg-gray-800 rounded-lg p-1">
-            {(['signin', 'signup'] as Tab[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => { setTab(t); setError(null); setMessage(null); }}
-                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  tab === t ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {t === 'signin' ? 'Sign In' : 'Sign Up'}
-              </button>
-            ))}
-          </div>
-
           {/* Google OAuth */}
           <button
             onClick={handleGoogle}
@@ -91,7 +90,7 @@ export function LoginPage() {
             <div className="flex-1 h-px bg-gray-700" />
           </div>
 
-          {/* Email/password form */}
+          {/* Smart email/password form */}
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="email"
@@ -103,10 +102,11 @@ export function LoginPage() {
             />
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Password (min 6 characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
             />
 
@@ -119,9 +119,13 @@ export function LoginPage() {
               className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               {loading && <Loader2 size={14} className="animate-spin" />}
-              {tab === 'signin' ? 'Sign In' : 'Create Account'}
+              Continue
             </button>
           </form>
+
+          <p className="text-xs text-gray-600 text-center mt-3">
+            We'll create your account automatically if you're new
+          </p>
         </div>
 
         <p className="text-center mt-4 text-xs text-gray-600">
