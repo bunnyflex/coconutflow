@@ -312,12 +312,15 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       targetHandle: e.target_handle,
     }));
 
+    const chatMessages = (flow.metadata as any)?.chat_messages || [];
+
     set({
       flowId: flow.id,
       flowName: flow.name,
       flowDescription: flow.description,
       nodes,
       edges,
+      chatMessages,
       selectedNodeId: null,
       isRunning: false,
       undoStack: [],
@@ -329,6 +332,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
     set({
       nodes: [],
       edges: [],
+      chatMessages: [],
       selectedNodeId: null,
       isRunning: false,
     });
@@ -366,6 +370,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         version: '1.0.0',
+        chat_messages: state.chatMessages,
       },
     };
   },
