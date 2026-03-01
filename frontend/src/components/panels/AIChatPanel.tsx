@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, PanelLeftClose, PanelLeftOpen, Sparkles } from 'lucide-react';
 import { useFlowStore } from '../../store/flowStore';
 import { chatApi } from '../../services/api';
+import { flowWebSocket } from '../../services/websocket';
 import { autoLayoutMutations } from '../../utils/autoLayout';
 import type { ChatMessage } from '../../types/flow';
 import type { FlowMutation } from '../../types/mutations';
@@ -14,6 +15,7 @@ export default function AIChatPanel() {
   const applyMutations = useFlowStore((s) => s.applyMutations);
   const nodes = useFlowStore((s) => s.nodes);
   const edges = useFlowStore((s) => s.edges);
+  const getFlowDefinition = useFlowStore((s) => s.getFlowDefinition);
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +37,40 @@ export default function AIChatPanel() {
     addMessage('user', text);
     setInput('');
     setIsLoading(true);
+
+    // Check for execution intent
+    const runPatterns = /^(run|execute|run it|try it|go|start|run the flow|run this)/i;
+    if (runPatterns.test(text)) {
+      // Extract optional input (e.g., "run it with 'AI trends'")
+      const inputMatch = text.match(/(?:with|using|for)\s+['"](.+?)['"]|(?:with|using|for)\s+(.+)$/i);
+      const userInput = inputMatch?.[1] || inputMatch?.[2] || '';
+
+      if (nodes.length === 0) {
+        addMessage('system', 'No flow on the canvas yet. Describe what you want to build first!');
+        setIsLoading(false);
+        return;
+      }
+
+      addMessage('assistant', `Running your flow${userInput ? ` with "${userInput}"` : ''}...`);
+
+      try {
+        const flow = getFlowDefinition();
+        await flowWebSocket.executeFlow(flow, userInput);
+
+        // Collect output after execution completes
+        const currentNodes = useFlowStore.getState().nodes;
+        const outputNode = currentNodes.find((n) => n.type === 'output' && n.data.output);
+        const anyOutput = currentNodes.find((n) => n.data.output);
+        const result = outputNode?.data.output || anyOutput?.data.output || 'Flow completed.';
+        addMessage('assistant', result);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Execution failed';
+        addMessage('system', msg);
+      } finally {
+        setIsLoading(false);
+      }
+      return;  // Don't proceed to AI chat API
+    }
 
     try {
       // Build message history for the API
