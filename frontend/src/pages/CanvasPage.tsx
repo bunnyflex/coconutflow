@@ -7,7 +7,7 @@ import ConfigPanel from '../components/panels/ConfigPanel';
 import ChatPanel from '../components/panels/ChatPanel';
 import { useFlowStore } from '../store/flowStore';
 import { flowApi } from '../services/api';
-import type { FlowDefinition } from '../types/flow';
+
 
 export function CanvasPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,14 +23,14 @@ export function CanvasPage() {
 
   return (
     <div className="flex h-screen w-screen bg-gray-950">
-      {/* Left Sidebar — draggable node library */}
-      <NodeSidebar />
-
       {/* Centre Canvas */}
       <main className="relative flex-1">
         <ReactFlowProvider>
           <FlowCanvas />
         </ReactFlowProvider>
+
+        {/* Node library — collapsible overlay on right side */}
+        <NodeSidebar />
       </main>
 
       {/* Right Sidebar — node configuration panel */}

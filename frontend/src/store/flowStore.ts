@@ -64,6 +64,9 @@ interface FlowState {
   chatMessages: ChatMessage[];
   isChatOpen: boolean;
 
+  // Node sidebar state
+  isNodeSidebarOpen: boolean;
+
   // Undo history
   undoStack: HistoryEntry[];
 
@@ -95,6 +98,9 @@ interface FlowState {
   clearChat: () => void;
   toggleChat: () => void;
   setChatOpen: (open: boolean) => void;
+
+  // Node sidebar actions
+  toggleNodeSidebar: () => void;
 
   // Undo
   pushUndo: () => void;
@@ -130,7 +136,7 @@ function getDefaultConfig(type: NodeType): NodeConfig {
       markdown: true,
     },
     web_search: { query_template: '', result_count: 5 },
-    knowledge_base: { files: [], chunk_size: 1000, top_k: 5, search_type: 'hybrid' },
+    knowledge_base: { files: [], sources: [], chunk_size: 1000, chunk_overlap: 200, top_k: 5, search_type: 'hybrid' },
     conditional: { condition: '', true_label: 'True', false_label: 'False' },
     output: { display_format: 'markdown', copy_to_clipboard: true },
     firecrawl_scrape: { url: '', formats: ['markdown'], include_metadata: true, credential_id: null },
@@ -181,6 +187,9 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   // Chat
   chatMessages: [],
   isChatOpen: false,
+
+  // Node sidebar
+  isNodeSidebarOpen: false,
 
   // Undo
   undoStack: [],
@@ -379,6 +388,12 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
 
   setChatOpen: (open) => set({ isChatOpen: open }),
+
+  // -----------------------------------------------------------------------
+  // Node sidebar
+  // -----------------------------------------------------------------------
+
+  toggleNodeSidebar: () => set((state) => ({ isNodeSidebarOpen: !state.isNodeSidebarOpen })),
 
   // -----------------------------------------------------------------------
   // Undo
