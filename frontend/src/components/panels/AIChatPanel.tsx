@@ -144,7 +144,7 @@ export default function AIChatPanel() {
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800/60">
         <div className="flex items-center gap-2">
           <Sparkles size={16} className="text-indigo-400" />
-          <h3 className="text-sm font-semibold text-gray-200">AI Assistant</h3>
+          <h3 className="text-sm font-semibold text-gray-200">Coco</h3>
         </div>
         <button
           onClick={() => setChatOpen(false)}
@@ -158,9 +158,9 @@ export default function AIChatPanel() {
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {messages.length === 0 && (
           <div className="text-center py-8 space-y-2">
-            <Sparkles size={24} className="text-indigo-400/60 mx-auto" />
-            <p className="text-sm text-gray-400">What would you like to build?</p>
-            <p className="text-xs text-gray-600">Describe your workflow and I'll create it on the canvas.</p>
+            <span className="text-2xl block">🥥</span>
+            <p className="text-sm text-gray-300 font-medium">Hey, I'm Coco!</p>
+            <p className="text-xs text-gray-500">Tell me what you want to build and I'll set it up on the canvas for you.</p>
           </div>
         )}
         {messages.map((msg) => (
