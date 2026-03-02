@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, PanelLeftClose, PanelLeftOpen, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useFlowStore } from '../../store/flowStore';
 import { chatApi } from '../../services/api';
 import { flowWebSocket } from '../../services/websocket';
@@ -212,7 +214,15 @@ function MessageBubble({ message }: { message: ChatMessage }) {
               : 'bg-gray-800/80 text-gray-200'
         }`}
       >
-        {message.content}
+        {isUser ? (
+          message.content
+        ) : (
+          <div className="prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2 prose-pre:my-2">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content}
+            </ReactMarkdown>
+          </div>
+        )}
       </div>
     </div>
   );
