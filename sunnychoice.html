@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoconutFlow — Final Palette: Cocoa × Dusk</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #1A1818;
+    color: #E4DED6;
+    padding: 32px;
+    min-height: 100vh;
+  }
+
+  h1 { text-align: center; font-size: 22px; font-weight: 600; color: #E8E2DA; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 13px; color: #6E6660; margin-bottom: 40px; }
+
+  /* ============ FULL APP MOCKUP ============ */
+  .app-frame {
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #353030;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  /* Top bar */
+  .app-topbar {
+    background: #252220;
+    border-bottom: 1px solid #332E2A;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .app-topbar .brand {
+    font-weight: 700;
+    font-size: 15px;
+    color: #E8E2DA;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .app-topbar .brand .icon {
+    width: 22px; height: 22px;
+    background: #CC785C;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #fff; font-weight: 700;
+  }
+  .app-topbar .flow-name {
+    font-size: 13px;
+    color: #9A928A;
+    font-weight: 500;
+  }
+  .app-topbar .actions {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-top {
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+  }
+  .btn-top.secondary {
+    background: transparent;
+    border: 1px solid #3A3530;
+    color: #9A928A;
+  }
+  .btn-top.primary {
+    background: #CC785C;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* Main layout */
+  .app-body {
+    display: grid;
+    grid-template-columns: 200px 1fr 280px;
+    height: 560px;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: #252220;
+    border-right: 1px solid #332E2A;
+    padding: 16px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidebar .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #5E5650;
+    padding: 12px 10px 6px;
+  }
+  .sidebar .nav-item {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #8A827A;
+    cursor: pointer;
+    font-weight: 450;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar .nav-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sidebar .nav-item.active {
+    background: rgba(204, 120, 92, 0.09);
+    color: #D4956E;
+  }
+  .sidebar .nav-item.active .dot { background: #CC785C; }
+  .sidebar .spacer { flex: 1; }
+  .sidebar .user-area {
+    padding: 10px;
+    border-top: 1px solid #302B28;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .sidebar .avatar {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: #353030;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #8A827A; font-weight: 600;
+  }
+  .sidebar .user-name {
+    font-size: 12px;
+    color: #9A928A;
+    font-weight: 500;
+  }
+
+  /* Canvas area — darkest surface so nodes pop */
+  .canvas {
+    background: #1A1818;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  .canvas-inner {
+    flex: 1;
+    background: #1A1818;
+    border: 1px solid #2A2624;
+    border-radius: 10px;
+    padding: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Nodes on canvas */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .node {
+    background: #2A2724;
+    border: 1px solid #383330;
+    border-radius: 10px;
+    width: 155px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .node:hover { border-color: #4A4540; }
+  .node-header {
+    padding: 8px 12px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px solid #302B28;
+  }
+  .node-header .node-icon {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 700;
+  }
+  .node-body {
+    padding: 10px 12px;
+    font-size: 10.5px;
+    color: #6E6660;
+  }
+  .node-body .field {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .node-body .field-label { color: #5E5650; }
+  .node-body .field-value { color: #9A928A; }
+
+  /* Node type colors */
+  .node.input .node-header { color: #7EB8F0; }
+  .node.input .node-icon { background: rgba(96, 165, 250, 0.15); color: #7EB8F0; }
+  .node.agent .node-header { color: #B09AFA; }
+  .node.agent .node-icon { background: rgba(167, 139, 250, 0.15); color: #B09AFA; }
+  .node.search .node-header { color: #5CC9A0; }
+  .node.search .node-icon { background: rgba(52, 211, 153, 0.12); color: #5CC9A0; }
+  .node.output .node-header { color: #E0A87C; }
+  .node.output .node-icon { background: rgba(204, 120, 92, 0.12); color: #E0A87C; }
+
+  /* Running state demo */
+  .node.running {
+    border-color: rgba(96, 165, 250, 0.4);
+    box-shadow: 0 0 16px rgba(96, 165, 250, 0.08);
+  }
+
+  .connector {
+    width: 24px; height: 2px;
+    background: #383330;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .connector::after {
+    content: '';
+    position: absolute;
+    right: -3px; top: -3px;
+    border-left: 5px solid #484440;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+  }
+
+  /* Mini-map hint */
+  .minimap {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 80px;
+    height: 50px;
+    background: #1A1816;
+    border: 1px solid #252220;
+    border-radius: 6px;
+    opacity: 0.6;
+  }
+
+  /* Right panel */
+  .config-panel {
+    background: #252220;
+    border-left: 1px solid #332E2A;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+  }
+  .config-panel .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .config-panel .panel-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #C8BEB4;
+  }
+  .config-panel .panel-header .close-btn {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: #2A2724;
+    border: 1px solid #353030;
+    color: #6E6660;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .config-section {
+    border-bottom: 1px solid #302B28;
+    padding-bottom: 14px;
+  }
+  .config-section:last-child { border-bottom: none; }
+  .config-section h4 {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #5E5650;
+    margin-bottom: 10px;
+  }
+  .form-field { margin-bottom: 10px; }
+  .form-field label {
+    display: block;
+    font-size: 11px;
+    color: #8A827A;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .form-field input, .form-field select, .form-field textarea {
+    width: 100%;
+    background: #2A2724;
+    border: 1px solid #353030;
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: #E0DAD2;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-field textarea {
+    resize: vertical;
+    min-height: 64px;
+    line-height: 1.45;
+  }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+    border-color: #CC785C;
+  }
+  .form-field input::placeholder, .form-field textarea::placeholder {
+    color: #5E5650;
+  }
+  .form-field .hint {
+    font-size: 10px;
+    color: #5E5650;
+    margin-top: 3px;
+  }
+
+  /* Toggle */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .toggle-row label {
+    font-size: 11.5px;
+    color: #8A827A;
+    font-weight: 500;
+  }
+  .toggle {
+    width: 32px; height: 18px;
+    background: #353030;
+    border-radius: 9px;
+    position: relative;
+    cursor: pointer;
+  }
+  .toggle.on { background: rgba(204, 120, 92, 0.35); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border-radius: 7px;
+    background: #6E6660;
+    top: 2px; left: 2px;
+    transition: all 0.15s;
+  }
+  .toggle.on::after {
+    background: #CC785C;
+    left: 16px;
+  }
+
+  /* ============ COLOR SPEC BELOW ============ */
+  .spec {
+    max-width: 1200px;
+    margin: 40px auto 0;
+  }
+  .spec h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #C8BEB4;
+    margin-bottom: 20px;
+  }
+
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .spec-card {
+    background: #211F1E;
+    border: 1px solid #302B28;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .spec-card h4 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #6E6660;
+    margin-bottom: 12px;
+  }
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .color-chip {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+  .color-info {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .color-info .name {
+    color: #B0A89E;
+    font-weight: 600;
+    display: block;
+  }
+  .color-info .hex {
+    color: #6E6660;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 10px;
+  }
+  .color-info .use {
+    color: #5E5650;
+    font-size: 10px;
+  }
+
+  /* Node color reference */
+  .node-colors {
+    max-width: 1200px;
+    margin: 20px auto 0;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .node-color-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #211F1E;
+    border: 1px solid #302B28;
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .node-color-chip .dot {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+  }
+  .node-color-chip .label {
+    font-size: 11px;
+    color: #8A827A;
+  }
+</style>
+</head>
+<body>
+
+<h1>CoconutFlow — Final Palette</h1>
+<p class="subtitle">Cocoa warmth + Dusk balance. Warm brown-gray backgrounds, terracotta accent, cream text.</p>
+
+<!-- Full app mockup -->
+<div class="app-frame">
+
+  <!-- Top bar -->
+  <div class="app-topbar">
+    <div class="brand">
+      <div class="icon">C</div>
+      CoconutFlow
+    </div>
+    <span class="flow-name">Customer Support Agent</span>
+    <div class="actions">
+      <button class="btn-top secondary">Export</button>
+      <button class="btn-top secondary">Save</button>
+      <button class="btn-top primary">Run Flow</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+
+    <!-- Left sidebar -->
+    <div class="sidebar">
+      <div class="section-label">Navigation</div>
+      <div class="nav-item active">
+        <div class="dot"></div>
+        Flows
+      </div>
+      <div class="nav-item"><div class="dot" style="background:transparent"></div> Templates</div>
+      <div class="nav-item"><div class="dot" style="background:transparent"></div> API Keys</div>
+      <div class="nav-item"><div class="dot" style="background:transparent"></div> Docs</div>
+
+      <div class="section-label" style="margin-top:16px">Recents</div>
+      <div class="nav-item"><div class="dot" style="background:transparent"></div> Blog Writer</div>
+      <div class="nav-item"><div class="dot" style="background:transparent"></div> Data Analyzer</div>
+
+      <div class="spacer"></div>
+      <div class="user-area">
+        <div class="avatar">SP</div>
+        <div class="user-name">Sunny P.</div>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas">
+      <div class="canvas-inner">
+        <div class="flow-row">
+          <div class="node input">
+            <div class="node-header">
+              <div class="node-icon">IN</div>
+              Input
+            </div>
+            <div class="node-body">
+              <div class="field"><span class="field-label">Label</span><span class="field-value">User query</span></div>
+            </div>
+          </div>
+
+          <div class="connector"></div>
+
+          <div class="node agent running">
+            <div class="node-header">
+              <div class="node-icon">AI</div>
+              LLM Agent
+            </div>
+            <div class="node-body">
+              <div class="field"><span class="field-label">Model</span><span class="field-value">GPT-4o</span></div>
+              <div class="field"><span class="field-label">Temp</span><span class="field-value">0.7</span></div>
+            </div>
+          </div>
+
+          <div class="connector"></div>
+
+          <div class="node search">
+            <div class="node-header">
+              <div class="node-icon">WS</div>
+              Web Search
+            </div>
+            <div class="node-body">
+              <div class="field"><span class="field-label">Engine</span><span class="field-value">DuckDuckGo</span></div>
+            </div>
+          </div>
+
+          <div class="connector"></div>
+
+          <div class="node output">
+            <div class="node-header">
+              <div class="node-icon">OUT</div>
+              Output
+            </div>
+            <div class="node-body">
+              <div class="field"><span class="field-label">Format</span><span class="field-value">Markdown</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="minimap"></div>
+      </div>
+    </div>
+
+    <!-- Config panel -->
+    <div class="config-panel">
+      <div class="panel-header">
+        <h3>LLM Agent</h3>
+        <div class="close-btn">&times;</div>
+      </div>
+
+      <div class="config-section">
+        <h4>Model Settings</h4>
+        <div class="form-field">
+          <label>Provider</label>
+          <select><option>OpenAI</option></select>
+        </div>
+        <div class="form-field">
+          <label>Model</label>
+          <select><option>GPT-4o</option></select>
+        </div>
+        <div class="form-field">
+          <label>Temperature</label>
+          <input type="text" value="0.7" />
+          <div class="hint">0 = deterministic, 1 = creative</div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h4>Prompt</h4>
+        <div class="form-field">
+          <label>System Prompt</label>
+          <textarea placeholder="You are a helpful customer support agent..."></textarea>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h4>Options</h4>
+        <div class="toggle-row">
+          <label>Streaming</label>
+          <div class="toggle on"></div>
+        </div>
+        <div class="toggle-row">
+          <label>Show reasoning</label>
+          <div class="toggle"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Color specification -->
+<div class="spec">
+  <h2>Color Specification</h2>
+  <div class="spec-grid">
+
+    <div class="spec-card">
+      <h4>Brand Accent</h4>
+      <div class="color-row">
+        <div class="color-chip" style="background:#CC785C"></div>
+        <div class="color-info">
+          <span class="name">Terracotta</span>
+          <span class="hex">#CC785C</span>
+          <span class="use">Buttons, active states, focus rings</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#D4956E"></div>
+        <div class="color-info">
+          <span class="name">Terracotta Light</span>
+          <span class="hex">#D4956E</span>
+          <span class="use">Active nav text, hover states</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:rgba(204,120,92,0.09)"></div>
+        <div class="color-info">
+          <span class="name">Terracotta Muted</span>
+          <span class="hex">CC785C / 9%</span>
+          <span class="use">Active nav background, subtle highlights</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <h4>Backgrounds</h4>
+      <div class="color-row">
+        <div class="color-chip" style="background:#1A1818"></div>
+        <div class="color-info">
+          <span class="name">Canvas</span>
+          <span class="hex">#1A1818</span>
+          <span class="use">Darkest — canvas where nodes live</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#252220"></div>
+        <div class="color-info">
+          <span class="name">Panels / Sidebar / Topbar</span>
+          <span class="hex">#252220</span>
+          <span class="use">Chrome surfaces framing the canvas</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#2A2724"></div>
+        <div class="color-info">
+          <span class="name">Cards / Inputs</span>
+          <span class="hex">#2A2724</span>
+          <span class="use">Nodes, form inputs, elevated surfaces</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <h4>Borders & Lines</h4>
+      <div class="color-row">
+        <div class="color-chip" style="background:#302B28"></div>
+        <div class="color-info">
+          <span class="name">Primary Border</span>
+          <span class="hex">#302B28</span>
+          <span class="use">Panel dividers, section borders</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#383330"></div>
+        <div class="color-info">
+          <span class="name">Card Border</span>
+          <span class="hex">#383330</span>
+          <span class="use">Node borders, input borders</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#4A4540"></div>
+        <div class="color-info">
+          <span class="name">Hover Border</span>
+          <span class="hex">#4A4540</span>
+          <span class="use">Hover/focus border highlight</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <h4>Text</h4>
+      <div class="color-row">
+        <div class="color-chip" style="background:#E8E2DA"></div>
+        <div class="color-info">
+          <span class="name">Primary</span>
+          <span class="hex">#E8E2DA</span>
+          <span class="use">Headings, primary labels</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#9A928A"></div>
+        <div class="color-info">
+          <span class="name">Secondary</span>
+          <span class="hex">#9A928A</span>
+          <span class="use">Body text, descriptions</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#6E6660"></div>
+        <div class="color-info">
+          <span class="name">Tertiary</span>
+          <span class="hex">#6E6660</span>
+          <span class="use">Hints, placeholders, timestamps</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <h4>Status</h4>
+      <div class="color-row">
+        <div class="color-chip" style="background:#5CC9A0"></div>
+        <div class="color-info">
+          <span class="name">Success</span>
+          <span class="hex">#5CC9A0</span>
+          <span class="use">Completed nodes, success messages</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#F07068"></div>
+        <div class="color-info">
+          <span class="name">Error</span>
+          <span class="hex">#F07068</span>
+          <span class="use">Error states, destructive actions</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#E0B050"></div>
+        <div class="color-info">
+          <span class="name">Warning</span>
+          <span class="hex">#E0B050</span>
+          <span class="use">Pending state, caution alerts</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <h4>Node Accents</h4>
+      <div class="color-row">
+        <div class="color-chip" style="background:#7EB8F0"></div>
+        <div class="color-info">
+          <span class="name">Input</span>
+          <span class="hex">#7EB8F0</span>
+          <span class="use">Input node headers + running state</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#B09AFA"></div>
+        <div class="color-info">
+          <span class="name">LLM Agent</span>
+          <span class="hex">#B09AFA</span>
+          <span class="use">Agent node headers</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" style="background:#E0A87C"></div>
+        <div class="color-info">
+          <span class="name">Output</span>
+          <span class="hex">#E0A87C</span>
+          <span class="use">Output node headers (warm, matches brand)</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
